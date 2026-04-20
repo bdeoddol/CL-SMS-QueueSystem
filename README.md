@@ -25,12 +25,15 @@ all in a .csv file
 -> exit
 
 ### parser
-->parse and pass data to group manager
+->parse and pass data to group manager //communicate cross-language via sockets/servers\
+-> pass the data in the format of a array of strings to the groupManager
+
 ### saveFile
 ->read/write active groups to a file and save data
 
 ### groupManager
 -> set gorupIDs\
+-> construct group given an array of strings with fields
 -> modify group (add members or create group)\
 -> priority queue (heap)\
 ->     full > larger group > smaller groups
