@@ -25,7 +25,7 @@ all in a .csv file
 -> exit
 
 ### parser
-->parse and pass data to group manager //communicate cross-language via sockets/servers
+->parse and pass data to group manager //communicate cross-language via sockets/servers\
 -> pass the data in the format of a array of strings to the groupManager
 
 ### saveFile
