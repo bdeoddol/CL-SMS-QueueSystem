@@ -1,59 +1,59 @@
-#include <iostream>
-#include <cstring>
-#include "QueueObject.h"
-using namespace std;
+// #include <iostream>
+// #include <cstring>
+// #include "QueueObject.h"
+// using namespace std;
 
 
-QueueObject::QueueObject(string phone, string name, int projID):phoneNumber(phone),fullName(name), projectID(projID){
-    if(projectID == 1){this->awaitingProject = "86!";}
-    else if(projectID == 2){this->awaitingProject = "Desk Drawer";}
-    else if(projectID == 3){this->awaitingProject = "Frisson";}
-    else{this->awaitingProject = "Invalid Project";}
-    sanitizeNumber();
-    if(validateNumber() == true){
-        phoneNumber.insert(0,"+"); //prepend with "+" once ensured the number is valid
-        this->validObj = true;
-    }
-    else{
-        this->validObj = false;
-    }
+// QueueObject::QueueObject(string phone, string name, int projID):_phoneNumber(phone),_fullName(name), _projectID(projID){
+//     if(_projectID == 1){this->_awaitingProject = "86!";}
+//     else if(_projectID == 2){this->_awaitingProject = "Desk Drawer";}
+//     else if(_projectID == 3){this->_awaitingProject = "Frisson";}
+//     else{this->_awaitingProject = "Invalid Project";}
+//     sanitizeNumber();
+//     if(validateNumber() == true){
+//         _phoneNumber.insert(0,"+"); //prepend with "+" once ensured the number is valid
+//         this->_validObj = true;
+//     }
+//     else{
+//         this->_validObj = false;
+//     }
 
-}   
+// }   
 
-    //assuming this is a ten digit number based in the US
+//     //assuming this is a ten digit number based in the US
     
-void QueueObject::sanitizeNumber(){
-    string sanitizedDigits;
-    for(int i = 0; i < phoneNumber.length(); i++){
-        if(isdigit(phoneNumber[i]) == true){
-            sanitizedDigits.push_back(phoneNumber[i]);
-        }
-    }
-    this->phoneNumber = sanitizedDigits;
+// void QueueObject::sanitizeNumber(){
+//     string sanitizedDigits;
+//     for(int i = 0; i < _phoneNumber.length(); i++){
+//         if(isdigit(_phoneNumber[i]) == true){
+//             sanitizedDigits.push_back(_phoneNumber[i]);
+//         }
+//     }
+//     this->_phoneNumber = sanitizedDigits;
 
-}
+// }
 
-bool QueueObject::validateNumber(){
-    if(phoneNumber.length() < 10){
-        return false;
-    }
-    else if((phoneNumber.length() == 11) && (phoneNumber[0] == '1')){
-        phoneNumber = phoneNumber.substr(1);
-        return true;
-    }
-    else if(phoneNumber[0] < '2' || phoneNumber[0] > '9'){
-        return false;
-    }
-    else if(phoneNumber[3] < '2' || phoneNumber[3] > '9'){
-        return false;
-    }
-    else if((phoneNumber.length() > 10) ){
-        return false;
-    }
-    else{
-        return true;
-    }
+// bool QueueObject::validateNumber(){
+//     if(_phoneNumber.length() < 10){
+//         return false;
+//     }
+//     else if((_phoneNumber.length() == 11) && (_phoneNumber[0] == '1')){
+//         _phoneNumber = _phoneNumber.substr(1);
+//         return true;
+//     }
+//     else if(_phoneNumber[0] < '2' || _phoneNumber[0] > '9'){
+//         return false;
+//     }
+//     else if(_phoneNumber[3] < '2' || _phoneNumber[3] > '9'){
+//         return false;
+//     }
+//     else if((_phoneNumber.length() > 10) ){
+//         return false;
+//     }
+//     else{
+//         return true;
+//     }
 
 
 
-}
+// }

@@ -1,29 +1,29 @@
 // #ifndef QueueObject
 // #define QueueObject
-#include <string>
-#include <iostream>
+// #include <string>
+// #include <iostream>
 
-    class QueueObject{
-        public:
+//     class QueueObject{
+//         public:
             
-            QueueObject(std::string phone, std::string name, int projectID);
-            void sanitizeNumber();
-            bool validateNumber();
-
-            
-
-
-
-
-        private:
+//             QueueObject(std::string phone, std::string name, int _projectID);
+//             void sanitizeNumber();
+//             bool validateNumber();
 
             
-            std::string phoneNumber;
-            std::string fullName;
-            int projectID;
-            std::string awaitingProject;    
-            bool validObj;  
-    };
+
+
+
+
+//         private:
+
+            
+//             std::string _phoneNumber;
+//             std::string _fullName;
+//             int _projectID;
+//             std::string _awaitingProject;    
+//             bool _validObj;  
+//     };
 
 
 
