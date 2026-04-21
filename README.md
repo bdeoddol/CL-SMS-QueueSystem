@@ -63,11 +63,12 @@ All stored in a .csv file
 -> construct group given a string array received from the C++ parser\
 -> modify group (add secondary phone numbers or create group)\
 -> priority queue (heap)\
--> full > larger group > smaller groups\
--> (talk about heap tail insertion later)\
+to track queue and allow for random access/modification, we will not be using a priority queue, instead we will used a vector-based heap\
+full > larger group > smaller groups\
+(talk about heap tail insertion later)\
 -> pop from queue when notified by the app\
 -> display active groups\
--> display queue
+-> display queue\
 
 ## group
 
