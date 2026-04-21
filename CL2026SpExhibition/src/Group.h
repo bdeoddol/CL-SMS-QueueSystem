@@ -6,10 +6,11 @@
 class Group{
     public:
     // void addMember(QueueObject person);
+    Group(std::string Name, std::string ID, std::string Number, int projID);    
     void killGroup();
     std::string sanitizeNumber(std::string Number);
     bool validateNumber(std::string Number);
-    Group(std::string Name, std::string ID, std::string Number, int projID);    
+    
 
     private: 
     std::string _fullName;  
