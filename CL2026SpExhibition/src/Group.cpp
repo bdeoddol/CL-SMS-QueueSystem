@@ -3,15 +3,31 @@
 #include <string>
 using namespace std;
 
-Group::Group(string Name, string ID, string Number, int projID):
-            _fullName(Name), _GroupID(ID), _projectID(projID)
+Group::Group(string Name, string ID, string Number, int projID, int size, int incrementPosition):
+            _fullName(Name), _groupID(ID), _projectID(projID),_groupSize(size),_incrementPosition(incrementPosition)
 {
     this->dead = false;
     this->_validObj = true;
+    this->_priorityBoost = 0;
+    this->_popsSinceArrival = 0;
+
 
     _primaryPhoneNumber = sanitizeNumber(Number);
-    _validObj = validateNumber(_primaryPhoneNumber);
+    if(validateNumber(_primaryPhoneNumber) == false){
+        this->_validObj = false;
+        return;
+    }
     
+
+    if(projID == 1){this->_awaitingProject = "86!";}
+    else if(projID == 2){this->_awaitingProject = "Frisson";}
+    else if(projID == 3){this->_awaitingProject = "Desk Drawer";}
+    else{
+        this->_awaitingProject == "Invalid projectID!";
+        this->_validObj == false;
+        return;
+        
+    }
 
 }
 
@@ -59,4 +75,37 @@ bool Group::validateNumber(string Number){
 
 
 
+}
+
+string Group::getNumber() const{
+    return _primaryPhoneNumber;
+}
+
+string Group::getPrimaryName() const{
+    return _fullName;
+}
+
+int Group::getGroupSize() const{
+    return this->_groupSize;
+}
+
+int Group::getIncrementPosition() const{
+    return this->_incrementPosition;
+}
+
+string Group::getGroupID() const{
+    return this->_groupID;
+}
+
+void Group::incrementElapsedWait(){
+    this->_popsSinceArrival++;
+    if(_popsSinceArrival%6==0){
+        _priorityBoost += (5 - _groupSize);
+        //this ensures that those with smaller group sizes get a larger boost relative to those that have larger group sizes
+        //boosts only occur if the group has been in queue for every 6th pop so about 30 minutes, each pop occuring every 5 miuntes for a typical project.
+    }
+}
+
+int Group::getBoostVal() const{
+    return _priorityBoost;
 }

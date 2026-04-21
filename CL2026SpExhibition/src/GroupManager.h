@@ -1,38 +1,42 @@
 #include <iostream>
 #include <vector>
-#include <queue>
-#include <map>
-// #include "QueueObject.h"
+#include <algorithm>
 #include "Group.h"
 #include "utilityFunc.h"
+// #include "QueueObject.h"
 
 class GroupManager{
     public: 
-        void addGroup();
-        void addMember(Group* Group);
+        /*
+        projID
+        1 = 86!
+        2 = Frission
+        3 = Desk Drawer
+        */
+        GroupManager(int projID);
+
+        void addGroup(Group groupAddition, std::string groupID);
+        // void addMember(std::string groupID, std::string );
         
         //search for a group
         Group* searchGroup(std::string groupID);
         
         //return all queued groups
-        std::vector<Group*> getActiveGroups();
+        std::vector<Group> getActiveGroups();
 
-        //return all queues groups in their order
-        std::vector<Group*> getQueue();
-
-        //pop group from queue, delete from active group
+        //pop group from queue, and retrieve its infor
         Group popGroup();
 
         //Returns the next group in queue (used for info, do not use to pop from queue)
         Group* peekQueue();
 
-        //sets the corresponding group to "dead" such that it will be popped immediately from the queue when it rises to the top, 
-        //delete its pointer in the activeGroup tracker.
+        //delete Group from queue, reorganize the heap.
         void deleteGroup(std::string groupID);
 
     private:
-        std::vector<Group*> _activeGroups;
-        std::priority_queue<Group> _groupQueue;
+        std::vector<Group> _activeGroups;
         int _idTracker;
+        int _projectID;
+        std::string _manageProject;
 
 };
