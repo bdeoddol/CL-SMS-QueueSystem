@@ -13,15 +13,6 @@ Group::Group(string Name, string ID, string Number, int projID):
     _validObj = validateNumber(_primaryPhoneNumber);
     
 
-
-    if(_projectID == 1){this->_awaitingProject = "86!";}
-    else if(_projectID == 2){this->_awaitingProject = "Desk Drawer";}
-    else if(_projectID == 3){this->_awaitingProject = "Frisson";}
-    else{
-        this->_awaitingProject = "Invalid Project";
-        this->_validObj = false;    
-    }
-
 }
 
 // void Group::addMember(QueueObject person){
