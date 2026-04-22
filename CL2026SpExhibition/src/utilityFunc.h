@@ -6,3 +6,5 @@
 #include <iostream>
 
 int generate4digNum();
+
+void printGroup(Group group);

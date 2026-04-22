@@ -12,6 +12,7 @@ GroupManager::GroupManager(int projID){
     if(projID == 1){this->_manageProject = "86!";}
     else if(projID == 2){this->_manageProject = "Frisson";}
     else if(projID == 3){this->_manageProject = "Desk Drawer";}
+    _idTracker = 0;
 }
 
 void GroupManager::addGroup(Group groupAddition, string groupID){
@@ -23,9 +24,15 @@ void GroupManager::addGroup(Group groupAddition, string groupID){
 
         return;
     }
-
+    groupAddition.setGroupID(generateGroupID());
     this->_activeGroups.push_back(groupAddition);
     push_heap(this->_activeGroups.begin(), this->_activeGroups.end(), GroupCompare());
+}
+
+string GroupManager::generateGroupID(){
+    string newID = "G" + to_string(this->_projectID) + "-" + to_string(this->_idTracker);
+    this->_idTracker++;
+    return newID;
 }
 // void addMember();
 
@@ -51,7 +58,7 @@ std::vector<Group> GroupManager::getActiveGroups(){
 Group GroupManager::popGroup(){
     if(_activeGroups.empty() == true){
         cout << "GroupManager for Project: " << _manageProject << " has no queue Groups at this time. Returning a group marked invalid.." << endl;
-        Group badGroup = Group("bad", "bad", "bad", 0, 0,0);
+        Group badGroup = Group("bad", "bad", 0, 0,0);
         badGroup._validObj = false;
         return badGroup;
     }
@@ -85,4 +92,8 @@ void GroupManager::deleteGroup(std::string groupID){
         }
     }
     return;
+}
+
+int GroupManager::getProjectId(){
+    return this->_projectID;
 }

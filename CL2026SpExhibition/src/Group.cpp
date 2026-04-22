@@ -3,13 +3,14 @@
 #include <string>
 using namespace std;
 
-Group::Group(string Name, string ID, string Number, int projID, int size, int incrementPosition):
-            _fullName(Name), _groupID(ID), _projectID(projID),_groupSize(size),_incrementPosition(incrementPosition)
+Group::Group(string Name, string Number, int projID, int size, int incrementPosition):
+            _fullName(Name), _projectID(projID),_groupSize(size),_incrementPosition(incrementPosition)
 {
     this->dead = false;
     this->_validObj = true;
     this->_priorityBoost = 0;
     this->_popsSinceArrival = 0;
+    this->_groupID = "-1";
 
 
     _primaryPhoneNumber = sanitizeNumber(Number);
@@ -109,3 +110,16 @@ void Group::incrementElapsedWait(){
 int Group::getBoostVal() const{
     return _priorityBoost;
 }
+
+vector<string> Group::getSecondaryNumbers() const{
+    return _secondaryPhoneNumbers;
+}
+
+string Group::getAwaitingProject() const{
+    return _awaitingProject;
+}
+
+void Group::setGroupID(string groupID){
+    this->_groupID = groupID;
+}
+
