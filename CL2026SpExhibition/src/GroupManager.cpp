@@ -17,10 +17,10 @@ GroupManager::GroupManager(int projID){
 
 void GroupManager::addGroup(Group groupAddition, string groupID){
     if(groupAddition._validObj == false){
-        cout << "Bad data being inserted. Fields listed as " << endl;
-        cout << "Group ID: " << groupAddition.getGroupID() << endl;
-        cout << "Group Primary Name: " << groupAddition.getPrimaryName() << endl;
-        cout << "Contact field failed at: " <<  groupAddition.getNumber() << endl;
+        cout << "! Bad data being inserted. Fields listed as " << endl;
+        cout << "! Group ID: " << groupAddition.getGroupID() << endl;
+        cout << "! Group Primary Name: " << groupAddition.getPrimaryName() << endl;
+        cout << "! Contact field failed at: " <<  groupAddition.getNumber() << endl;
 
         return;
     }
@@ -57,7 +57,7 @@ std::vector<Group> GroupManager::getActiveGroups(){
 //pop group from queue to retrieve its info
 Group GroupManager::popGroup(){
     if(_activeGroups.empty() == true){
-        cout << "GroupManager for Project: " << _manageProject << " has no queue Groups at this time. Returning a group marked invalid.." << endl;
+        cout << "! GroupManager for Project: " << _manageProject << " has no queue Groups at this time. Returning a group marked invalid.." << endl;
         Group badGroup = Group("bad", "bad", 0, 0,0);
         badGroup._validObj = false;
         return badGroup;

@@ -15,7 +15,7 @@ class GroupManager{
         */
         GroupManager(int projID);
 
-        void addGroup(Group groupAddition);
+        void addGroup(Group groupAddition, std::string groupID);
         // void addMember(std::string groupID, std::string );
         
         //search for a group
