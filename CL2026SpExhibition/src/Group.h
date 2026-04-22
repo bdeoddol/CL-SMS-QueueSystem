@@ -6,17 +6,22 @@
 class Group{
     public:
     // void addMember(QueueObject person);
-    Group(std::string Name, std::string ID, std::string Number, int projID, int size, int incrementPosition);    
+    Group(std::string Name, std::string Number, int projID, int size, int incrementPosition);    
     void killGroup();
     std::string sanitizeNumber(std::string Number);
     bool validateNumber(std::string Number);
     void incrementElapsedWait();
+    void setGroupID(std::string groupID);
+
     int getGroupSize() const;
     int getIncrementPosition() const;
     std::string getGroupID() const;
     int getBoostVal() const;
+
     std::string getPrimaryName() const;
     std::string getNumber() const;
+    std::vector<std::string> getSecondaryNumbers() const;
+    std::string getAwaitingProject() const;
     
     bool _validObj;
 

@@ -15,7 +15,7 @@ class GroupManager{
         */
         GroupManager(int projID);
 
-        void addGroup(Group groupAddition, std::string groupID);
+        void addGroup(Group groupAddition);
         // void addMember(std::string groupID, std::string );
         
         //search for a group
@@ -32,6 +32,9 @@ class GroupManager{
 
         //delete Group from queue, reorganize the heap.
         void deleteGroup(std::string groupID);
+
+        int getProjectId();
+        string generateGroupID();
 
     private:
         std::vector<Group> _activeGroups;
