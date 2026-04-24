@@ -4,7 +4,7 @@
 
 class FormContainer{
     public:
-    FormContainer(std::string Name, std::string Number, int projID, int groupSize);
+    FormContainer(std::string Name, std::string Number, int projID, int groupSize, std::string msgID);
     std::string getFullName();
     std::string getPrimaryNumber();
     int getProjectID();
@@ -17,5 +17,6 @@ class FormContainer{
     std::string _primaryPhoneNumber;
     int _projectID;
     int _groupSize;
+    std::string _msgID;
 
 };

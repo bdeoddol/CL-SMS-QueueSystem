@@ -61,3 +61,27 @@ int parseProtocol(string protocol){
         return -1;
     }
 }
+
+bool sendWholeMessage(int socket, string msg){
+    //because TCP streams do not guarantee that all of the sent data will be whole, it's possible that the stream sends in partial data
+    //send() will return the number of bytes sent,
+    //if the number of bytes sent == the size of your message, the data has been sent whole
+    //if the number of bytes sent < the size of our message, the data has been sent partially and must be looped again to send the remaining message
+    //      while by default, the 2nd arg, msg.c_str() will return a pointer to the first character of the c_string array, 
+    //      you must modify the second arg such that the argument will return a pointer to the start of the REMAINING data to be sent in the c_string array
+    //      the same is true for the msg.size(), as you are no longer sending the whole, but a part of it. Therefore, subtract the total bytes sent from msg.size()
+    //if the number of bytes sent == -1, an error has occured while sending the message. abort.
+
+    ssize_t bytesSent;
+    ssize_t totalSent = 0;
+
+    while(totalSent < msg.size()){
+        bytesSent = send(socket, msg.c_str()+totalSent, msg.size()-totalSent, 0);
+        if(bytesSent == -1){
+            return false;
+        }
+        totalSent += bytesSent;
+    }
+
+    return true;
+}

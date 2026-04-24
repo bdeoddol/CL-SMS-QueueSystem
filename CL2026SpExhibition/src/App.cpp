@@ -4,17 +4,24 @@
 #include <thread>
 #include <winsock2.h> //socket library
 #include <ws2tcpip.h> //needed for ipv6
-#include <unistd.h>
+#include <string> //required for string comparison
+// Source - https://stackoverflow.com/a/2340697
+// Posted by Yacoby, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-04-22, License - CC BY-SA 3.0
+#include <ctype.h>
+
 
 using namespace std;
 
 App::App(){
     // construct and assign two threads as the designated client threads of the APP. These two will perform the work
     // https://en.cppreference.com/cpp/thread/thread/thread
-    this->_recieveThread = thread(some args here); 
-    this->_sendThread = thread(some args here); 
     this->_currProtocol = -1;
-    this->clientSocket = -1;
+    this->_clientSocket = INVALID_SOCKET;
+    this->_connected = false;
+    this->_paused = true;
+    this->_alive = true;
+
 
     this->_IPv4serverAddress = {};
     this->_IPv6serverAddress = {};
@@ -52,40 +59,47 @@ void App::handle(string input){
         return;
     }
 
-    int command = stoi(tokens[0]);
-    if(command == 1){
-        programStatus();
-    } else if(command == 2){
-        if(tokens.size() < 2){
-            cout << "! Invalid command: missing manager_id" << endl;
+    try{
+        int command = stoi(tokens[0]);
+        if(command == 1){
+            programStatus();
+        } else if(command == 2){
+            if(tokens.size() < 2){
+                cout << "! Invalid command: missing manager_id" << endl;
+                return;
+            }
+            string manager_id = tokens[1];
+            groupManagerStatus(manager_id);
+        } else if(command == 3){
+            pauseParse();
+        } else if(command == 4){
+            resumeParse();
+        } else if(command == 5){
+            if(tokens.size() < 2){
+                cout << "! Invalid command: missing project_id" << endl;
+                return;
+            }
+            pop(stoi(tokens[1]));
+        } else if(command == 6){
+            if(tokens.size() < 2){
+                cout << "! Invalid command: missing manager_id" << endl;
+                return;
+            }
+            showActiveGroups(stoi(tokens[1]));
+        } else if(command == 7){
+            connectToJavaServer();
+        } else if(command == 0){
+            exit(0);
+        } else {
+            cout << "Invalid command" << endl;
             return;
         }
-        string manager_id = tokens[1];
-        groupManagerStatus(manager_id);
-    } else if(command == 3){
-        pauseParse();
-    } else if(command == 4){
-        resumeParse();
-    } else if(command == 5){
-        if(tokens.size() < 2){
-            cout << "! Invalid command: missing project_id" << endl;
-            return;
-        }
-        pop(stoi(tokens[1]));
-    } else if(command == 6){
-        if(tokens.size() < 2){
-            cout << "! Invalid command: missing manager_id" << endl;
-            return;
-        }
-        showActiveGroups(stoi(tokens[1]));
-    } else if(command == 7){
-        connectToJavaServer();
-    } else if(command == 0){
-        exit(0);
-    } else {
-        cout << "Invalid command" << endl;
+    }
+    catch(const exception& e){
+        cout << "! Detected invalid input: Please check your input and enter numeric values for commands and IDs." << endl;
         return;
     }
+    return;
 } 
 
 void App::pop(int project_id){
@@ -112,7 +126,31 @@ void App::showActiveGroups(int project_id){
     }
 }
 
+bool App::attemptConnection(int protocol, struct sockaddr* addr, size_t addrLen){
+    if(this->_clientSocket != INVALID_SOCKET){
+        closesocket(this->_clientSocket);
+        this->_clientSocket = INVALID_SOCKET;
+    }
+
+    this->_clientSocket = socket(protocol, SOCK_STREAM, 0);
+    if(this->_clientSocket == INVALID_SOCKET){
+        return false;
+    }
+
+    int connectTest = connect(this->_clientSocket, addr, addrLen);
+    if(connectTest == SOCKET_ERROR){
+        closesocket(this->_clientSocket);
+        this->_clientSocket = INVALID_SOCKET;
+        return false;
+    }
+    return true;
+}
+
 void App::connectToJavaServer(string hostIP, int portNumber, std::string protocol){
+    if(_connected == true){
+        cout << "! Already connected to a server host! Please disconnected before connecting." << endl;
+        return;
+    }
     //we will be using ipv6 for local connections, and ipv4 for outside network connections
     //because we are connecting to a java program on a local or remote device, the host ip, it's protocol, and port is known
 
@@ -127,19 +165,6 @@ void App::connectToJavaServer(string hostIP, int portNumber, std::string protoco
         cout << "! Bad protocol" << endl;
         return;
     }
-
-    if(connectMode == AF_INET){
-        this->clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    }
-    else if(connectMode == AF_INET6){
-        this->clientSocket = socket(AF_INET6, SOCK_STREAM, 0);
-    }
-    
-    if(this->clientSocket == -1){
-        cout << "! Failed to create socket" << endl;
-        return;
-    }
-
     //specifying the address we are setting up the temporary data to feed to and be used by the OS once we call connect()
     //These will tell the OS the necessary protocols and info to be used to connect to the destination
     //Think of them like a buffer value
@@ -158,65 +183,185 @@ void App::connectToJavaServer(string hostIP, int portNumber, std::string protoco
     */
     
     //https://beej.us/guide/bgnet/html/#structsockaddrman
-    int connectTest = -1;
+    bool isConnected = false;
     if(connectMode == AF_INET){
         //if IPv4
         //grab IPv4 Public Address for hostIP
         this->_currProtocol = AF_INET;
         this->_IPv4serverAddress = IPv4SpecifiedDestination(hostIP, portNumber);
-        connectTest = connect(clientSocket, (struct sockaddr *)&_IPv4serverAddress, sizeof(_IPv4serverAddress));
-
+        isConnected = attemptConnection(connectMode, (struct sockaddr *)&_IPv4serverAddress, sizeof(_IPv4serverAddress));
     }
     else if(connectMode == AF_INET6){
         //if IPv6,
         //typically, we will run the parser on the same device, so grab the local-link ipv6 for hostIP
         this->_currProtocol = AF_INET6;
         this->_IPv6serverAddress = IPv6SpecifiedDestination(hostIP, portNumber);
-        connectTest = connect(clientSocket, (struct sockaddr *)&_IPv6serverAddress, sizeof(_IPv6serverAddress));
+        isConnected = attemptConnection(connectMode, (struct sockaddr *)&_IPv6serverAddress, sizeof(_IPv6serverAddress));
     }
-    if(connectTest == -1){
+    if(isConnected == false){
         cout << "! Failed to connect, please input valid host IP, port number, and protocol";
-        close(clientSocket);
-        this->clientSocket = -1;
+        this->_connected = false;
         return;
     }
 
+    
+    this->_connected = true;
+    if (_receiveThread.joinable()){ //ensure the thread is joinable
+        //have the main thread wait until the _recieveThread finishes it's execution (receivingStream()) before joining it 
+        //and reassigning _receiveThread to a new execution.
+        //if you do not join before starting and reassigning a new one,
+        //CPP states that it will call std::terminate() on the program
+        //once the old execution that is without a threadobject finishes
+        _receiveThread.join();
+    }
+    this->_alive = true;
+    this->_paused = false;
+                this->_receiveThread = thread(&App::receivingStream, this); 
+        //cite: https://en.cppreference.com/cpp/thread/thread/thread
+        //example: std::thread t5(&foo::bar, &f); // t5 runs foo::bar() on object f
     return;
 }
 
 void App::reconnect(){
+    disconnect();
     if(this->_currProtocol == -1){
         cout << "! There is no previous connection to reconnect to" << endl;
         return;
     }
 
-    int connectTest;
+    bool isConnected;
     if(this->_currProtocol == AF_INET){
-        this->clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-        connectTest = connect(clientSocket, (struct sockaddr *)&_IPv4serverAddress, sizeof(_IPv4serverAddress));
-        if(clientSocket == -1){
-            cout << "! Failed to reconnnect to IPv4 server socket!" << endl;
-        }
+        isConnected = attemptConnection(this->_currProtocol, (struct sockaddr *)&_IPv4serverAddress, sizeof(_IPv4serverAddress));
     }
     else if(this->_currProtocol == AF_INET6){
-        this->clientSocket = socket(AF_INET6, SOCK_STREAM, 0);
-        connectTest = connect(clientSocket, (struct sockaddr *)&_IPv6serverAddress, sizeof(_IPv6serverAddress));
-        if(clientSocket == -1){
-            cout << "! Failed to reconnnect to IPv6 server socket!" << endl;
-        }
+        isConnected = attemptConnection(this->_currProtocol, (struct sockaddr *)&_IPv6serverAddress, sizeof(_IPv6serverAddress));
     }
-    
-    if(connectTest == -1){
+    if(isConnected == false){
         cout << "! Reconnect failed, please check host IP, port number, and protocol" << endl;
-        this->clientSocket = -1;
+        this->_connected = false;
+        return;
     }
+    this->_connected = true;
+    if (_receiveThread.joinable()){
+        _receiveThread.join();
+    }
+    this->_alive = true;
+    this->_paused = false;
+                this->_receiveThread = thread(&App::receivingStream, this); 
+        //cite: https://en.cppreference.com/cpp/thread/thread/thread
+        //example: std::thread t5(&foo::bar, &f); // t5 runs foo::bar() on object f
+    return;
 }
 
 void App::disconnect(){
-    close(this->clientSocket);
-    this->clientSocket = -1;
-    this->_currProtocol = -1;
+    //kill recievethread. set connection to off. Close the socket
+    if(this->_connected == false){ cout << "! Already disconnected!" << endl; return;}
+    this->_paused = true;
+    this->_connected = false;    
+    this->_alive = false;
+    if (_clientSocket != INVALID_SOCKET) {
+    // wakes recv() called in receivingStream(), tells it to stop blocking _receiveThread() while waiting to receive data.
+    // (Recieve could be waiting for another stream and blocks the thread until it gets something)
+    // calling disconnect() without properly stopping recv from "listening" will cause a deadlock where 
+    // the thread calling disconenct() waits for recv to finish listening but it never does.
+        shutdown(_clientSocket, SD_BOTH);
+    }
+    if (_receiveThread.joinable()){_receiveThread.join(); }
+    if (_clientSocket != INVALID_SOCKET) {closesocket(_clientSocket);}
+    this->_clientSocket = INVALID_SOCKET;
+    return;
+}
 
-    //todo
-    stop the recieve and sending threads here!
+
+void App::receivingStream(){
+    char buffer_recv[1024] ;
+    int byte_count;
+    string builtJsonString;
+    size_t pos = string::npos;
+    string extractString;
+    while((this->_alive == true) && (this->_connected == true) ){
+        if(this->_paused == true){
+            Sleep(100);
+            continue;
+        }
+        byte_count = recv(this->_clientSocket, buffer_recv, sizeof(buffer_recv)-1, 0);
+        if(byte_count == -1){ 
+            cout << "! Error within receive stream. Disconnecting and pausing parse... please reconnect again" << endl;
+            this->_alive = false;
+            this->_connected = false;
+            //check for _connected, call disconnect() within main
+            return;
+        }
+        else if(byte_count == 0){ 
+            cout << "! Connected server has closed! Disconnecting and pausing parse... please reconnect again" << endl;
+            this->_alive = false;
+            this->_connected = false;
+            //check for _connected, call disconnect() within main
+            return;
+        }
+
+        builtJsonString.append(buffer_recv, byte_count);
+        //It is possible to recieve fragmented data such that the first loop does not contain a full json string. 
+        //So we much check for \n in multiple loops
+        while((pos = builtJsonString.find('\n')) != string::npos){
+            //find() should return the index of the first occurence of "\n" which we will denote as the end of a json string send by the java parser
+            //otherwise it will return string::npos if no char is found
+            //we will extract this json string
+            extractString = builtJsonString.substr(0, pos);
+            builtJsonString.erase(0, pos+1);
+            this->CParser.parseJsonString(extractString);
+            //TODO: Cparser should get an object back so that i can check the msg ID attached to the obj and send back confirmation
+
+            sendConfirmation(_clientSocket, c:messageID goes here);
+        }        
+    }
+ 
+    //when paused, the thread will finish work and die. Ensure that upon resuming, threads are constructed once again
+    return;
+}
+
+////there will be two valid types of user defined that can be sent, a pause parser command (p), a start parser command(s)
+void App::userSendStream(string cmd){
+    string message = cmd;
+    if(message.empty() == true){
+        cout << "! Empty command, type a valid command" << endl;
+        return;   
+    }
+    else if( message[0] == 'p'){
+        this->_paused = true;
+    }
+    else if(message[0] == 's'){
+        if(this->_connected == false){
+            this->_paused = true;
+            cout << "! No connecion to the JAVA parser found! Please connected before starting CPP parser" << endl;
+            return;
+        }
+        this->_paused = false;
+        
+
+    }
+    else{ cout << "! Unrecognized command, please enter a valid cmd" << endl; return;}
+
+    if(this->_clientSocket == INVALID_SOCKET){
+        cout << "! No connected server to send command to. Please connect to a server" << endl;
+        return;
+    }
+    message.append("\n");
+    
+    if(sendWholeMessage(this->_clientSocket, message) == false){ cout << "! Could not send command: " << message << endl; return;}
+    else{cout << "! Internal CMD sent Sucessfully" << endl;}
+}
+
+//internal command to confirm recieved JSON string is parsed in the format "c-msgID"
+void App::sendConfirmation(int ID){
+    string message = "c-" + to_string(ID);
+
+    if(this->_clientSocket == INVALID_SOCKET){
+        cout << "! No connected server to send command to. Please connect to a server" << endl;
+        return;
+    }
+    message.append("\n");
+    if(sendWholeMessage(this->_clientSocket, message) == false){cout << "! Could not send confirmation signal for command: " << message << endl; return;}
+    else{cout << "! Internal CMD sent Sucessfully" << endl;}
+    return;
 }

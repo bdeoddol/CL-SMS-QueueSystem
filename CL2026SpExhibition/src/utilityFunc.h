@@ -15,3 +15,5 @@ struct sockaddr_in6 IPv6SpecifiedDestination(std::string hostIP, int portNumber)
 struct sockaddr_in IPv4SpecifiedDestination(std::string hostIP, int portNumber);
 
 int parseProtocol(std::string protocol);
+
+bool sendWholeMessage(int socket, std::string msg);

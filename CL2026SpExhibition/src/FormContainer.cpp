@@ -4,8 +4,8 @@
 using namespace std;
 
 
-FormContainer::FormContainer(std::string Name, std::string Number, int projID, int groupSize):
-    _fullName(Name), _primaryPhoneNumber(Number), _projectID(projID), _groupSize(groupSize){
+FormContainer::FormContainer(std::string Name, std::string Number, int projID, int groupSize, std::string msgID):
+    _fullName(Name), _primaryPhoneNumber(Number), _projectID(projID), _groupSize(groupSize), _msgID(msgID){
 
 } 
     
