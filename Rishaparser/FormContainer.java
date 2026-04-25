@@ -4,16 +4,18 @@ public class FormContainer {
     String _primaryPhoneNumber;
     int _projectID;
     int _groupSize;
+    int _msgID;
 
-    public FormContainer(String var1, String var2, int var3, int var4) {
+    public FormContainer(String var1, String var2, int var3, int var4, int var5) {
         this._fullName = var1;
         this._primaryPhoneNumber = var2;
         this._groupSize = var3;
         this._projectID = var4;
+        this._msgID = var5;
     }
 
     public String toString() {
         return this._fullName + ", " + this._primaryPhoneNumber + ", size: " + 
-        this._groupSize + ", project id: " + this._projectID;
+        this._groupSize + ", project id: " + this._projectID + ", message id: " + this._msgID;
    }
 }

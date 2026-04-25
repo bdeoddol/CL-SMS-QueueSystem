@@ -44,8 +44,9 @@ public class Parser {
         inputThead.setDaemon(true);
         inputThead.start();
 
-
         while(true) {
+            //message id incrementer resets every refresh unless u dont want that lmk 
+            int msgInc = 0;
             if(!paused) {
                 BufferedReader var2 = new BufferedReader(new InputStreamReader((new URL(var1)).openStream()));
                 ArrayList<FormContainer> var3 = new ArrayList<FormContainer>();
@@ -56,8 +57,9 @@ public class Parser {
                     if (var5) {
                         var5 = false;
                     } else {
+                        msgInc++;
                         String[] var6 = var4.split(",");
-                        var3.add(new FormContainer(var6[0], var6[1], Integer.parseInt(var6[2]), Integer.parseInt(var6[3])));
+                        var3.add(new FormContainer(var6[0], var6[1], Integer.parseInt(var6[2]), Integer.parseInt(var6[3]), msgInc));
                     }
                 }
 
