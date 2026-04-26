@@ -6,6 +6,11 @@ This project is a queue system designed to take input from a Google Form and que
 
 Upon the next group’s turn, their information should include their phone number that will be used to send an SMS text notification
 
+note for next semester buy this to support sms texting: 
+
+https://www.amazon.com/waveshare-SIM7600G-H-DONGLE-Adapter-Communication/dp/B08CSB596W 
+
+
 ### Google Form
 
 ## Google Forms requires:
@@ -32,12 +37,36 @@ All stored in a .csv file
 * receive and confirmation to pop from specified project queue
 * request show all active groups from all groupManagers 
     * (should be organized)
+    * _extra_:
+        * should be it's own page, therefore clear the terminal
+        * allow feature to return to the menu once finished viewing. clear the terminal, and display the menu again
 * request show queues from all groupManagers 
     * (should be organized)
-* request display active groups from specified groupManager
-* request display queue from specified groupManager
+    * _extra_:
+        * should be it's own page, therefore clear the terminal
+        * allow feature to return to the menu once finished viewing. clear the terminal, and display the menu
 * support a function that creates a socket client connection to the Java server
+    * this function will create 1 thread within itself that should be constructed upon connecting.
+    * this function will handle both IPv4 and IPv6 protocols of the destination address. It should swap inbetween protocols depending on the specified connection set by the user. 
+        * in this way, connection will have a mode of either ipv4 or ipv6 
+* support reconnecting to the parser
+    * there should be an error if there has been no previous connection or there is already an established connection
+* support disconnecting from the parser
+    * upon disconnecting, wake threads and tidy up their work, and die
 * receives JSON strings streamed from server and passes to the C++ parser object
+    * therad should, UPON CONNECTION, begin listening for data.
+    * this function should be a callable function upon thread creation
+    * when disconnecting within the thread's execution, set _connection flag = false and _paused = true and check on the main thread, call disconnect() if any of the previous conditions are true
+
+* for any new connection via connection() or reconnect(), join the receiveThread before creating a new one
+    * app should indicate _alive == true if the thread is created and executing
+    
+* send byte commands streams back to the Java parser.
+    * p = pause
+        * when paused, set _paused to true, block the thread from executing after finishing up parsing the last jasonString it sees. 
+        * this can be done by placing a _pause checker within the while execution loop. If true, sleep
+    * s = start
+    * c-## = confirm object recieved for msgID = ##
 * exit
 
 ## JAVA parser
