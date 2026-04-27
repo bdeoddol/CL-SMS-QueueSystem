@@ -8,14 +8,17 @@
 
 using namespace std;
 
-GroupManager::GroupManager(int projID){
-    if(projID == 1){this->_manageProject = "86!";}
-    else if(projID == 2){this->_manageProject = "Frisson";}
-    else if(projID == 3){this->_manageProject = "Desk Drawer";}
+GroupManager::GroupManager(int projID, string ProjectName){
+    this->_projectID = projID;
+    this->_manageProject = ProjectName;
+
+    // if(projID == 1){this->_manageProject = "86!";}
+    // else if(projID == 2){this->_manageProject = "Frisson";}
+    // else if(projID == 3){this->_manageProject = "Desk Drawer";}
     _idTracker = 0;
 }
 
-void GroupManager::addGroup(Group groupAddition, string groupID){
+void GroupManager::addGroup(Group groupAddition){
     if(groupAddition._validObj == false){
         cout << "! Bad data being inserted. Fields listed as " << endl;
         cout << "! Group ID: " << groupAddition.getGroupID() << endl;
@@ -24,6 +27,7 @@ void GroupManager::addGroup(Group groupAddition, string groupID){
 
         return;
     }
+    groupAddition.setIncrementPosition(_idTracker); //the id tracker labels groups incrementally. As they are passed into the queue, they are labeled by their order of arrival. This is also the ID for their group
     groupAddition.setGroupID(generateGroupID());
     this->_activeGroups.push_back(groupAddition);
     push_heap(this->_activeGroups.begin(), this->_activeGroups.end(), GroupCompare());
@@ -31,13 +35,14 @@ void GroupManager::addGroup(Group groupAddition, string groupID){
 
 string GroupManager::generateGroupID(){
     string newID = "G" + to_string(this->_projectID) + "-" + to_string(this->_idTracker);
+
     this->_idTracker++;
     return newID;
 }
 // void addMember();
 
 //search for a group
-Group* GroupManager::searchGroup(std::string groupID){
+Group* GroupManager::searchGroup(string groupID){
     vector<Group>::iterator it;
     for(it = this->_activeGroups.begin(); it != this->_activeGroups.end(); ++it){
         if(it->getGroupID() == groupID){
@@ -50,31 +55,42 @@ Group* GroupManager::searchGroup(std::string groupID){
 }
 
 //return all queued groups
-std::vector<Group> GroupManager::getActiveGroups(){
+vector<Group> GroupManager::getActiveGroups(){
     return this->_activeGroups;
 }
 
+//get name of project this gruopmanager is manager
+string GroupManager::getProjectName(){
+    return _manageProject;
+}
+
 //pop group from queue to retrieve its info
-Group GroupManager::popGroup(){
-    if(_activeGroups.empty() == true){
-        cout << "! GroupManager for Project: " << _manageProject << " has no queue Groups at this time. Returning a group marked invalid.." << endl;
-        Group badGroup = Group("bad", "bad", 0, 0,0);
-        badGroup._validObj = false;
-        return badGroup;
-    }
-    pop_heap(this->_activeGroups.begin(), this->_activeGroups.end(), GroupCompare()); //send top element to back of queue
-    Group retGroup = _activeGroups.back();
-    _activeGroups.pop_back(); //remove the back element
+Group GroupManager::popGroup() {
 
-    //increment elapsed wait time for all groups
-    for(int i = 0; i < _activeGroups.size(); i++){
-        _activeGroups[i].incrementElapsedWait();
-    }
-    //reheapify the queue such that the new priorities are evaluated
-    make_heap(_activeGroups.begin(), _activeGroups.end(), GroupCompare());
-    
+    while (!_activeGroups.empty()) {
 
-    return retGroup;
+        pop_heap(_activeGroups.begin(), _activeGroups.end(), GroupCompare());
+        Group retGroup = _activeGroups.back();
+        _activeGroups.pop_back();
+
+        // increment wait time for remaining groups
+        for (int i = 0; i < _activeGroups.size(); i++) {
+            _activeGroups[i].incrementElapsedWait();
+        }
+
+        make_heap(_activeGroups.begin(), _activeGroups.end(), GroupCompare());
+
+        //return only if valid
+        if (retGroup._validObj) {
+            return retGroup;
+        }
+
+        //otherwise skip and continue loop
+    }
+
+    // nothing valid left
+    cout << "! No valid groups in queue for project: " << _manageProject << endl;
+    return Group();  // invalid group
 }
 
 //Returns the next group in queue (used for info, do not use to pop from queue)

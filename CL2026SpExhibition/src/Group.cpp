@@ -3,8 +3,12 @@
 #include <string>
 using namespace std;
 
-Group::Group(string Name, string Number, int projID, int size, int incrementPosition):
-            _fullName(Name), _projectID(projID),_groupSize(size),_incrementPosition(incrementPosition)
+Group::Group(){
+    this->_validObj == false;
+}
+
+Group::Group(string Name, string Number, int projID, int size):
+            _fullName(Name), _projectID(projID),_groupSize(size)
 {
     this->dead = false;
     this->_validObj = true;
@@ -24,8 +28,8 @@ Group::Group(string Name, string Number, int projID, int size, int incrementPosi
     else if(projID == 2){this->_awaitingProject = "Frisson";}
     else if(projID == 3){this->_awaitingProject = "Desk Drawer";}
     else{
-        this->_awaitingProject == "Invalid projectID!";
-        this->_validObj == false;
+        this->_awaitingProject = "Invalid projectID!";
+        this->_validObj = false;
         return;
         
     }
@@ -93,6 +97,9 @@ int Group::getGroupSize() const{
 int Group::getIncrementPosition() const{
     return this->_incrementPosition;
 }
+void Group::setIncrementPosition(int groupID){
+    this->_incrementPosition = groupID;
+}
 
 string Group::getGroupID() const{
     return this->_groupID;
@@ -101,7 +108,7 @@ string Group::getGroupID() const{
 void Group::incrementElapsedWait(){
     this->_popsSinceArrival++;
     if(_popsSinceArrival%6==0){
-        _priorityBoost += (5 - _groupSize);
+        _priorityBoost += max(0,(5 - _groupSize));
         //this ensures that those with smaller group sizes get a larger boost relative to those that have larger group sizes
         //boosts only occur if the group has been in queue for every 6th pop so about 30 minutes, each pop occuring every 5 miuntes for a typical project.
     }
@@ -123,3 +130,6 @@ void Group::setGroupID(string groupID){
     this->_groupID = groupID;
 }
 
+int Group::getProjectID(){
+    return _projectID;
+}
