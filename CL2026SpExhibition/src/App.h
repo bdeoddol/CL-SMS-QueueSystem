@@ -38,20 +38,25 @@ class App{
     void showActiveGroups(int project_id);
 
     //*** THE RULE OF THUMB IS THAT UPON CONNECTION TO SERVER, BEGIN LSITENING FOR DATA */
-    //connects to a given hostIP, portNum, and protocol (ipv4 or ipv6)
+    //connects to a given hostIP, portNum, and protocol (ipv4 or ipv6), calls the actual connect() func
     //starts receivingthread
     void connectToJavaServer(std::string hostIP, int portNumber, std::string protocol);
-    //attempts to reconnect to the same serversocket using saved settings given in connectToJavaServer
+    
+    //helper function for connectToJavaServer that makes connection with the ServerSocket
+    bool attemptConnection(int IPprotocol, struct sockaddr* addr, size_t addrLen);
+
+    //attempts to reconnect to the same serversocket using the last saved parameters given to connectToJavaServer
     //starts receivingthread  
     void reconnect();
-    //helper function for connectToJavaServer that calls the actual connect() function
-    bool attemptConnection(int protocol, struct sockaddr* addr, size_t addrLen);
 
-    //disconnects from the server socket and kills the receiver thread
+    //disconnects from the server. shut down connection, kills the receiver thread via .join(), closes _clientSocket
     void disconnect();
 
     //execution function for receivingthread
     void receivingStream();
+
+    //start up a new receive thread
+    void startReceiveThread();
     
     //given a command, sends to the serversocket thru stream
     void userSendStream(std::string cmd);
