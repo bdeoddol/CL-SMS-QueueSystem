@@ -5,7 +5,8 @@
 #include <vector>
 #include <random>
 #include <iostream>
-
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
 int generate4digNum();
 
@@ -17,4 +18,6 @@ struct sockaddr_in IPv4SpecifiedDestination(std::string hostIP, int portNumber);
 
 int parseProtocol(std::string protocol);
 
-bool sendWholeMessage(int socket, std::string msg);
+bool sendWholeMessage(SOCKET socket, std::string msg);
+
+#endif

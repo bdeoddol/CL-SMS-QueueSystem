@@ -1,74 +1,108 @@
 package Rishaparser;
-// Source code is decompiled from a .class file using FernFlower decompiler (from Intellij IDEA).
-import java.io.BufferedReader;
+
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+
+import com.opencsv.CSVReader;
 import com.google.gson.Gson;
-//won't let me compile w this
-//import javax.swing.GroupLayout.Group;
 
-//returns json string
 public class Parser {
-    static volatile boolean paused = false;
+    private final String sheetUrl;
+    private final Gson gson;
+    private volatile boolean paused = false;
+    private int lastSeen = -1;
+    private int lastFetch = -1;
+    private int stableCount = 0;
+    private static final int REQ_STABLE = 3;
 
-    public Parser() {
+    public Parser(String sheetUrl) {
+        this.sheetUrl = sheetUrl;
+        this.gson = new Gson();
     }
 
-    public static void main(String[] var0) throws Exception {
-        String var1 = "https://docs.google.com/spreadsheets/d/1_euUtfA1exxkrcJQVm3hN_C3xjNgGapVu3zrxLIwITs/export?format=csv&gid=0";
-        
-        Gson gson = new Gson();
-        //bg thread 2 listen for spacebar + enter
-        Thread inputThead = new Thread(()->{
-            //need try-catch to handle IOException
+    public ArrayList<FormContainer> fetchEntries() throws Exception {
+        String noCacheUrlPlease = sheetUrl + "&t=" + System.currentTimeMillis();
+        CSVReader csvReader = new CSVReader(new InputStreamReader((new URL(noCacheUrlPlease)).openStream()));
+        ArrayList<FormContainer> entries = new ArrayList<>();
+        boolean firstLine = true;
+        int msgInc = -1;
+
+        String[] fields;
+        while((fields = csvReader.readNext()) != null) {
+            if(firstLine) {
+                firstLine = false;
+                continue;
+            }
+            if(fields.length < 5) continue;
+            msgInc++;
+            entries.add(new FormContainer(fields[1], fields[2], 
+                parseOrDefault(fields[3], 0), 
+                parseOrDefault(fields[4], 0), 
+                msgInc));
+        }
+
+        csvReader.close();
+        return entries;
+    }
+
+      public void run() throws Exception {
+        startInputListener();
+        while (true) {
+            if (!paused) {
+                ArrayList<FormContainer> entries = fetchEntries();
+                int currentCount = entries.size();
+
+                if(currentCount == lastFetch) {
+                    stableCount++;
+                } else {
+                    stableCount = 0;
+                }
+
+                if(stableCount >= REQ_STABLE && currentCount > (lastSeen + 1)) {
+                    ArrayList<FormContainer> newEntries = new ArrayList<>();
+                    for(int i = lastSeen + 1; i < entries.size(); i++) {
+                        newEntries.add(entries.get(i));
+                    }
+                    lastSeen = currentCount - 1;
+                    stableCount = 0;
+                    System.out.println(gson.toJson(newEntries));
+                }
+                lastFetch = currentCount;
+            }
+            Thread.sleep(3000);
+        }
+    }
+
+    private int parseOrDefault(String s, int defaultVal) {
+        try {
+            return Integer.parseInt(s.trim());
+        } catch (NumberFormatException e) {
+            return defaultVal;
+        }
+}
+
+    public void startInputListener() {
+        Thread inputThread = new Thread(() -> {
             try {
-                while(true) {
-                    char key = (char)System.in.read();
-                    if(key == ' ') {
+                while (true) {
+                    char key = (char) System.in.read();
+                    if (key == ' ') {
                         paused = !paused;
-                        if(paused) {
-                            System.out.println("\n===paused===");
-                        } else {
-                            System.out.println("\n===unpaused===");
-                        }
+                        System.out.println(paused ? "\n===paused===" : "\n===unpaused===");
                     }
                 }
-            } catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
+        inputThread.setDaemon(true);
+        inputThread.start();
+    }
 
-        //set thread as bg process and start
-        inputThead.setDaemon(true);
-        inputThead.start();
-
-
-        while(true) {
-            if(!paused) {
-                BufferedReader var2 = new BufferedReader(new InputStreamReader((new URL(var1)).openStream()));
-                ArrayList<FormContainer> var3 = new ArrayList<FormContainer>();
-                boolean var5 = true;
-
-                String var4;
-                while((var4 = var2.readLine()) != null) {
-                    if (var5) {
-                        var5 = false;
-                    } else {
-                        String[] var6 = var4.split(",");
-                        var3.add(new FormContainer(var6[0], var6[1], Integer.parseInt(var6[2]), Integer.parseInt(var6[3])));
-                    }
-                }
-
-                var2.close();
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-
-                String jsonString = gson.toJson(var3);
-                System.out.println(jsonString);
-
-            }
-        Thread.sleep(5000L);
-      }
-   }
+    public static void main(String[] args) throws Exception {
+        String url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFDUhAVVoYXpQvqKQ0FrBU_c3c5vPG-ImbMxqeZhKfz0gStUOADiTnmxlbn_q0ar_q8xCiffIr0UVk/pub?output=csv";
+        new Parser(url).run();
+    }
 }
