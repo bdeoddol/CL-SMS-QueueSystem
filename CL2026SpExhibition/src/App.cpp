@@ -1,6 +1,7 @@
+
 #include "App.h"
-#include <sstream>
 #include "utilityFunc.h"
+#include <sstream>
 #include <thread>
 #include <winsock2.h> //socket library
 #include <ws2tcpip.h> //needed for ipv6
@@ -11,6 +12,7 @@
 #include <ctype.h>
 #include "FormContainer.h"
 #include "Group.h"
+#include <nlohmann/json.hpp>
 
 
 using namespace std;
@@ -88,7 +90,7 @@ void App::handle(string input){
                 cout << "! Invalid command: missing manager_id" << endl;
                 return;
             }
-            string manager_id = tokens[1];
+            int manager_id = stoi(tokens[1]);
             groupManagerStatus(manager_id);
         } else if(command == 3){
             cout << "Connected" << boolalpha << isConnected() << endl;
@@ -110,7 +112,7 @@ void App::handle(string input){
                 cout << "! Invalid command: need hostIP, port number, protocol" << endl;
                 return;
             }
-            connectToJavaServer(tokens[1], stoi(tokens[2], tokens[[3]]));
+            connectToJavaServer(tokens[1], stoi(tokens[2]), tokens[3]);
         } else if(command == 7){
             reconnect();
         } else if(command == 8){
@@ -193,7 +195,7 @@ bool App::attemptConnection(int IPprotocol, struct sockaddr* addr, size_t addrLe
     return true;
 }
 
-void App::connectToJavaServer(string hostIP, int portNumber, std::string protocol){
+void App::connectToJavaServer(string hostIP, int portNumber, string protocol){
     if(_connected == true){
         cout << "! Already connected to a server host! Please disconnected before connecting." << endl;
         return;

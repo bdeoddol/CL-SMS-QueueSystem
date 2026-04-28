@@ -1,3 +1,4 @@
+#pragma once
 #include "QueueObject.h"
 #include "Group.h"
 #include <string>

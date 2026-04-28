@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string>
 #include <vector>
@@ -5,6 +6,7 @@
 #include <winsock2.h> //socket library
 #include <ws2tcpip.h> //needed for ipv6
 #include <atomic> //atomic is like "static" in java
+#include <nlohmann/json.hpp>
 #include "GroupManager.h"
 #include "CParser.h"
 
@@ -18,7 +20,7 @@ class App{
     2 = Frission
     3 = Desk Drawer
     */
-    App(string* projects, int numProj);
+    App(std::string* projects, int numProj);
     void displayOptions();
     void handle(std::string input);
 
@@ -79,7 +81,7 @@ class App{
     struct sockaddr_in6 _IPv6serverAddress;
     struct sockaddr_in _IPv4serverAddress;
     int _clientSocket;
-    vector<GroupManager> _managers;
+    std::vector<GroupManager> _managers;
     CParser CParser;
 
 };

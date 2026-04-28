@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -14,7 +15,7 @@ class GroupManager{
         3 = Desk Drawer
         */
        //give the groupmanager an ID and the name of the project it will be handling.
-        GroupManager(int projID, string ProjectName);
+        GroupManager(int projID, std::string ProjectName);
 
        //get the numerical ID of the project/group
         int getProjectId();
@@ -42,7 +43,7 @@ class GroupManager{
         void deleteGroup(std::string groupID);
 
         //generates the gruop id using the current value and formats it as "G-[_idTracker]"
-        string generateGroupID();
+        std::string generateGroupID();
 
     private:
         std::vector<Group> _activeGroups;
