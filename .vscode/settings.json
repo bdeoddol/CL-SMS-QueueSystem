@@ -3,7 +3,10 @@
         "."
     ],
     "java.project.referencedLibraries": [
-        "C:/Users/rishi/gson-2.13.2.jar"
+        "C:/Users/rishi/gson-2.13.2.jar",
+        "C:/Users/rishi/opencsv-5.12.0.jar"
     ],
+    
+    
     "C_Cpp.errorSquiggles": "disabled"
 }
