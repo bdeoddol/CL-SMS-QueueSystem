@@ -1,8 +1,9 @@
+#ifndef CPARSER_H
+#define CPARSER_H
+
 #include "Group.h"
 #include "GroupManager.h"
 #include "FormContainer.h"
-
-#include <iostream>
 #include <string>
 #include <nlohmann/json.hpp>
 
@@ -12,9 +13,6 @@ class CParser{
     public:
         ns::FormContainer parseJsonString(std::string jsonString);
         Group convertFormContainerToGroup(ns::FormContainer group);
-
-    private:
-
-
-
 };
+
+#endif

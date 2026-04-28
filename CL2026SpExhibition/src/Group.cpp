@@ -4,7 +4,7 @@
 using namespace std;
 
 Group::Group(){
-    this->_validObj == false;
+    this->_validObj = false;
 }
 
 Group::Group(string Name, string Number, int projID, int size):
