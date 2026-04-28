@@ -18,7 +18,7 @@ GroupManager::GroupManager(int projID, string ProjectName){
     _idTracker = 0;
 }
 
-void GroupManager::addGroup(Group groupAddition){
+void GroupManager::addGroup(Group groupAddition, string groupID){
     if(groupAddition._validObj == false){
         cout << "! Bad data being inserted. Fields listed as " << endl;
         cout << "! Group ID: " << groupAddition.getGroupID() << endl;
