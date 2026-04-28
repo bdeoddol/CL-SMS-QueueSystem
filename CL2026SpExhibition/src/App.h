@@ -52,10 +52,10 @@ class App{
     //disconnects from the server. shut down connection, kills the receiver thread via .join(), closes _clientSocket
     void disconnect();
 
-    //execution function for receivingthread
+    //helper for userSendStream, execution function for receivingthread
     void receivingStream();
 
-    //start up a new receive thread
+    //helper for userSendStream, start up a new receive thread
     void startReceiveThread();
     
     //given a command, sends to the serversocket thru stream

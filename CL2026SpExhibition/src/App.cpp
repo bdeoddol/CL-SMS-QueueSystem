@@ -47,18 +47,24 @@ void App::displayOptions(){
     cout << "  CLI CONTROL INTERFACE" << endl;
     cout << "=============================================" << endl;
     cout << "  STATUS" << endl;
-    cout << "    1. Program status" << endl;
-    cout << "    2. Group manager status  <manager_id>" << endl;
+    cout << "    1. Program status" << endl; //frontend table library
+    cout << "    2. Group manager status  <manager_id>" << endl; //done
+    cout << "    3. Check connection status" << endl; //done
     cout << "---------------------------------------------" << endl;
     cout << "  PARSING" << endl;
-    cout << "    3. Send Signal <s = start parse or p = pause parse>" << endl;
+    cout << "    4. Send Signal (s = start parse or p = pause parse)" << endl; //userSendStream, done
+    cout << "    5. Send confirmation to Java parser" << endl; //sendConfirmation
     cout << "---------------------------------------------" << endl;
-    cout << "    4. Pop from project queue  <project_id>" << endl;
-    cout << "    5. Show all active groups <project_id>" << endl;
+    cout << "  SERVERS" << endl;
     cout << "    6. Connect to Java server  <host> <port> <IP Protocol>" << endl;
-    cout << "    0. Exit" << endl;
+    cout << "    7. Reconnect to Java server" << endl;
+    cout << "    8. Disconnect from Java server" << endl;
+    cout << "---------------------------------------------" << endl;
+    cout << "    9. Pop from project queue  <project_id>" << endl; //done
+    cout << "    10. Show all active groups <project_id>" << endl; //done? i think?
+    cout << "    11. Exit program" << endl; //done? i think?
     cout << "=============================================" << endl;
-    cout << "Enter command: ";
+    cout << "Enter command number: ";
 }
 
 void App::handle(string input){
@@ -85,24 +91,43 @@ void App::handle(string input){
             string manager_id = tokens[1];
             groupManagerStatus(manager_id);
         } else if(command == 3){
-            pauseParse();
+            cout << "Connected" << boolalpha << isConnected() << endl;
         } else if(command == 4){
-            resumeParse();
+            if(tokens.size() < 2){
+                cout << "! Invalid command: missing s or p" << endl;
+                return;
+            }
+            string cmd = tokens[1];
+            userSendStream(cmd);
         } else if(command == 5){
+            if(tokens.size() < 2){
+                cout << "! Invalid command: missing msgID" << endl;
+                return;
+            }
+            sendConfirmation(stoi(tokens[1]));
+        } else if(command == 6){
+            if(tokens.size() < 4){
+                cout << "! Invalid command: need hostIP, port number, protocol" << endl;
+                return;
+            }
+            connectToJavaServer(tokens[1], stoi(tokens[2], tokens[[3]]));
+        } else if(command == 7){
+            reconnect();
+        } else if(command == 8){
+            disconnect();
+        } else if(command == 9){
             if(tokens.size() < 2){
                 cout << "! Invalid command: missing project_id" << endl;
                 return;
             }
             pop(stoi(tokens[1]));
-        } else if(command == 6){
+        } else if(command == 10){
             if(tokens.size() < 2){
                 cout << "! Invalid command: missing manager_id" << endl;
                 return;
             }
             showActiveGroups(stoi(tokens[1]));
-        } else if(command == 7){
-            connectToJavaServer();
-        } else if(command == 0){
+        } else if(command == 11){
             exit(0);
         } else {
             cout << "Invalid command" << endl;
@@ -411,5 +436,5 @@ void App::sendConfirmation(int ID){
 }
 
 bool App::isConnected(){
-return _connected;  
+    return _connected;  
 }
