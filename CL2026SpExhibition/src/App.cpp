@@ -438,5 +438,30 @@ void App::sendConfirmation(int ID){
 }
 
 bool App::isConnected(){
-    return _connected;  
+    return _connected;
+}
+
+void App::programStatus(){
+    cout << "Connected: " << boolalpha << _connected.load() << endl;
+    cout << "Paused:    " << boolalpha << _paused.load() << endl;
+    cout << "Managers:  " << _managers.size() << endl;
+    for(int i = 0; i < (int)_managers.size(); i++){
+        cout << "  [" << _managers[i].getProjectId() << "] " << _managers[i].getProjectName()
+             << "  queue size: " << _managers[i].getActiveGroups().size() << endl;
+    }
+}
+
+void App::groupManagerStatus(int projID){
+    for(int i = 0; i < (int)_managers.size(); i++){
+        if(_managers[i].getProjectId() == projID){
+            cout << "Manager [" << projID << "] " << _managers[i].getProjectName() << endl;
+            vector<Group> groups = _managers[i].getActiveGroups();
+            cout << "  Queue size: " << groups.size() << endl;
+            for(int j = 0; j < (int)groups.size(); j++){
+                printGroup(groups[j]);
+            }
+            return;
+        }
+    }
+    cout << "! No GroupManager for projectID: " << projID << " found" << endl;
 }

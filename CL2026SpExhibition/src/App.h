@@ -10,11 +10,9 @@
 #include "GroupManager.h"
 #include "CParser.h"
 
-
 class App{
   public:
-
-      /*
+    /*
     projID
     1 = 86!
     2 = Frission
@@ -25,18 +23,14 @@ class App{
     void handle(std::string input);
 
   private:
-    
+
     void programStatus();
-    //displays the status of a group manager given it's id (the projectID),
     void groupManagerStatus(int projID);
-    
+
     bool pauseParse();
     bool startParse();
 
-    //pops from the queue of a given managers project ID
     void pop(int project_id);
-
-    //displays all the actives groups of a given managers project ID
     void showActiveGroups(int project_id);
 
     //*** THE RULE OF THUMB IS THAT UPON CONNECTION TO SERVER, BEGIN LSITENING FOR DATA */
@@ -62,21 +56,13 @@ class App{
     
     //given a command, sends to the serversocket thru stream
     void userSendStream(std::string cmd);
-
-    //sends a confirmation message to javaparser on serversocket to pop the JSON data corresponding to the given msgID 
     void sendConfirmation(int ID);
-
-    //check if the app is connected
     bool isConnected();
 
     std::atomic<bool> _paused;
     std::atomic<bool> _alive;
-
-
-    private:
     std::atomic<bool> _connected;
     std::thread _receiveThread;
-    // std::thread _sendThread;
     int _currProtocol;
     struct sockaddr_in6 _IPv6serverAddress;
     struct sockaddr_in _IPv4serverAddress;
@@ -84,4 +70,4 @@ class App{
     std::vector<GroupManager> _managers;
     CParser CParser;
 
-};
+#endif
