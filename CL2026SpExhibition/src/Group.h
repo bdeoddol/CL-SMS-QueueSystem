@@ -1,6 +1,5 @@
-#ifndef GROUP_H
-#define GROUP_H
-
+// #include "QueueObject.h"
+#pragma once
 #include <string>
 #include <vector>
 

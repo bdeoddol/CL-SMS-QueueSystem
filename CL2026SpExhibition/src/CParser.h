@@ -1,6 +1,4 @@
-#ifndef CPARSER_H
-#define CPARSER_H
-
+#pragma once
 #include "Group.h"
 #include "GroupManager.h"
 #include "FormContainer.h"
