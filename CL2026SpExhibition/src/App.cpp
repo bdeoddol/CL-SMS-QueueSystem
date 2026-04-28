@@ -79,67 +79,48 @@ void App::handle(string input){
         return;
     }
 
-    try{
-        int command = stoi(tokens[0]);
-        if(command == 1){
-            programStatus();
-        } else if(command == 2){
-            if(tokens.size() < 2){
-                cout << "! Invalid command: missing manager_id" << endl;
+        try{
+            int command = stoi(tokens[0]);
+            if(command == 1){
+                programStatus();
+            } else if(command == 2){
+                if(tokens.size() < 2){
+                    cout << "! Invalid command: missing manager_id" << endl;
+                    return;
+                }
+                string manager_id = tokens[1];
+                groupManagerStatus(manager_id);
+            } else if(command == 3){
+                pauseParse();
+            } else if(command == 4){
+                resumeParse();
+            } else if(command == 5){
+                if(tokens.size() < 2){
+                    cout << "! Invalid command: missing project_id" << endl;
+                    return;
+                }
+                pop(stoi(tokens[1]));
+            } else if(command == 6){
+                if(tokens.size() < 2){
+                    cout << "! Invalid command: missing manager_id" << endl;
+                    return;
+                }
+                showActiveGroups(stoi(tokens[1]));
+            } else if(command == 7){
+                connectToJavaServer();
+            } else if(command == 0){
+                exit(0);
+            } else {
+                cout << "Invalid command" << endl;
                 return;
             }
-            string manager_id = tokens[1];
-            groupManagerStatus(manager_id);
-        } else if(command == 3){
-            cout << "Connected" << boolalpha << isConnected() << endl;
-        } else if(command == 4){
-            if(tokens.size() < 2){
-                cout << "! Invalid command: missing s or p" << endl;
-                return;
-            }
-            string cmd = tokens[1];
-            userSendStream(cmd);
-        } else if(command == 5){
-            if(tokens.size() < 2){
-                cout << "! Invalid command: missing msgID" << endl;
-                return;
-            }
-            sendConfirmation(stoi(tokens[1]));
-        } else if(command == 6){
-            if(tokens.size() < 4){
-                cout << "! Invalid command: need hostIP, port number, protocol" << endl;
-                return;
-            }
-            connectToJavaServer(tokens[1], stoi(tokens[2], tokens[[3]]));
-        } else if(command == 7){
-            reconnect();
-        } else if(command == 8){
-            disconnect();
-        } else if(command == 9){
-            if(tokens.size() < 2){
-                cout << "! Invalid command: missing project_id" << endl;
-                return;
-            }
-            pop(stoi(tokens[1]));
-        } else if(command == 10){
-            if(tokens.size() < 2){
-                cout << "! Invalid command: missing manager_id" << endl;
-                return;
-            }
-            showActiveGroups(stoi(tokens[1]));
-        } else if(command == 11){
-            exit(0);
-        } else {
-            cout << "Invalid command" << endl;
+        }
+        catch(const exception& e){
+            cout << "! Detected invalid input: Please check your input and enter numeric values for commands and IDs." << endl;
             return;
         }
-    }
-    catch(const exception& e){
-        cout << "! Detected invalid input: Please check your input and enter numeric values for commands and IDs." << endl;
         return;
-    }
-    return;
-} 
+    } 
 
 void App::pop(int project_id){  
     for (int i = 0; i < _managers.size(); i++){
@@ -298,75 +279,78 @@ void App::disconnect(){
     return;
 }
 
-void App::receivingStream(){
-    char buffer_recv[1024] ;
-    int byte_count;
-    string builtJsonString;
-    size_t pos = string::npos;
-    string extractString;
-    int confirmID;
-    ns::FormContainer fc;
-    int currentclientSocket = this->_clientSocket;
-    while((this->_alive == true) && (this->_connected == true) ){
-        if(this->_paused == true){
-            Sleep(100);
-            continue;
-        }
-        byte_count = recv(currentclientSocket, buffer_recv, sizeof(buffer_recv)-1, 0);
-        if(byte_count == -1){ 
-            cout << "! Error within receive stream. Disconnecting and pausing parse... please reconnect again" << endl;
-            this->_alive = false;
-            this->_connected = false;
-            hi check this error messge//check for _connected, call disconnect() within main thread
-            return;
-        }
-        else if(byte_count == 0){ 
-            cout << "! Connected server has closed! Disconnecting and pausing parse... please reconnect again" << endl;
-            this->_alive = false;
-            this->_connected = false;
-            hi check this error messge//check for _connected, call disconnect() within MAIN thread
-            return;
-        }
-
-        builtJsonString.append(buffer_recv, byte_count);
-        //It is possible to recieve fragmented data such that the first loop does not contain a full json string. 
-        //So we much check for \n in multiple loops
-        while((pos = builtJsonString.find('\n')) != string::npos){
-            //find() should return the index of the first occurence of "\n" which we will denote as the end of a json string send by the java parser
-            //otherwise it will return string::npos if no char is found
-            //we will extract this json string
-            extractString = builtJsonString.substr(0, pos);
-            builtJsonString.erase(0, pos+1);
-            
-            try{
-                fc = this->CParser.parseJsonString(extractString);
-            }
-            catch(...){ //catch all exceptions syntax: if json::parse throws for any reason, we can safely assume this is bad data and we skip it
+    void App::receivingStream(){
+        char buffer_recv[1024] ;
+        int byte_count;
+        string builtJsonString;
+        size_t pos = string::npos;
+        string extractString;
+        int confirmID;
+        ns::FormContainer fc;
+        int currentclientSocket = this->_clientSocket;
+        while((this->_alive == true) && (this->_connected == true) ){
+            if(this->_paused == true){
+                Sleep(100);
                 continue;
             }
+            byte_count = recv(currentclientSocket, buffer_recv, sizeof(buffer_recv)-1, 0);
+            if(byte_count == -1){ 
+                cout << "! Error within receive stream. Disconnecting and pausing parse... please reconnect again" << endl;
+                this->_alive = false;
+                this->_connected = false;
+                hi check this error messge//check for _connected, call disconnect() within main thread
+                return;
+            }
+            else if(byte_count == 0){ 
+                cout << "! Connected server has closed! Disconnecting and pausing parse... please reconnect again" << endl;
+                this->_alive = false;
+                this->_connected = false;
+                hi check this error messge//check for _connected, call disconnect() within MAIN thread
+                return;
+            }
+
+            builtJsonString.append(buffer_recv, byte_count);
+            //It is possible to recieve fragmented data such that the first loop does not contain a full json string. 
+            //So we much check for \n in multiple loops
+            while((pos = builtJsonString.find('\n')) != string::npos){
+                //find() should return the index of the first occurence of "\n" which we will denote as the end of a json string send by the java parser
+                //otherwise it will return string::npos if no char is found
+                //we will extract this json string
+                extractString = builtJsonString.substr(0, pos);
+                builtJsonString.erase(0, pos+1);
+                
+                try{
+                    fc = this->CParser.parseJsonString(extractString);
+                }
+                catch(...){ //catch all exceptions syntax: if json::parse throws for any reason, we can safely assume this is bad data and we skip it
+                    continue;
+                }
 
 
 
-            if(!fc.getFullName().empty() && !fc.getPrimaryNumber().empty()){
-                //create new group, add to corresponding groupmanager
-                Group newGroup = this->CParser.convertFormContainerToGroup(fc);
-                for(int i = 0; i < this->_managers.size(); i++){
-                    if(_managers[i].getProjectId() == newGroup.getProjectID()){
-                        this->_managers[i].addGroup(newGroup);
-                        break;
+                if(!fc.getFullName().empty() && !fc.getPrimaryNumber().empty()){
+                    //create new group, add to corresponding groupmanager
+                    Group newGroup = this->CParser.convertFormContainerToGroup(fc);
+                    for(int i = 0; i < this->_managers.size(); i++){
+                        if(_managers[i].getProjectId() == newGroup.getProjectID()){
+                            this->_managers[newGroup.getProjectID()].addGroup(newGroup);
+                            break;
+                        }
                     }
                 }
-            }
-            if(fc.getMsgID() >= 0){
-                confirmID = fc.getMsgID();
-                sendConfirmation(confirmID);
-            }
-        }        
-    }
+                if(fc.getMsgID() >= 0){
+                    confirmID = fc.getMsgID();
+                    sendConfirmation(confirmID);
+                }
 
-    //when paused/not alive anymore, the thread will finish work and die. Ensure that upon unpausing, threads are constructed once again
-    return;
-}
+
+
+            }        
+        }
+    
+        //when paused, the thread will finish work and die. Ensure that upon resuming, threads are constructed once again
+        return;
+    }
 
 void App::startReceiveThread() {
     this->_alive = false; //pause execution of this curr Receivethread, so that it can exit
@@ -436,5 +420,30 @@ void App::sendConfirmation(int ID){
 }
 
 bool App::isConnected(){
-    return _connected;  
+    return _connected;
+}
+
+void App::programStatus(){
+    cout << "Connected: " << boolalpha << _connected.load() << endl;
+    cout << "Paused:    " << boolalpha << _paused.load() << endl;
+    cout << "Managers:  " << _managers.size() << endl;
+    for(int i = 0; i < (int)_managers.size(); i++){
+        cout << "  [" << _managers[i].getProjectId() << "] " << _managers[i].getProjectName()
+             << "  queue size: " << _managers[i].getActiveGroups().size() << endl;
+    }
+}
+
+void App::groupManagerStatus(int projID){
+    for(int i = 0; i < (int)_managers.size(); i++){
+        if(_managers[i].getProjectId() == projID){
+            cout << "Manager [" << projID << "] " << _managers[i].getProjectName() << endl;
+            vector<Group> groups = _managers[i].getActiveGroups();
+            cout << "  Queue size: " << groups.size() << endl;
+            for(int j = 0; j < (int)groups.size(); j++){
+                printGroup(groups[j]);
+            }
+            return;
+        }
+    }
+    cout << "! No GroupManager for projectID: " << projID << " found" << endl;
 }

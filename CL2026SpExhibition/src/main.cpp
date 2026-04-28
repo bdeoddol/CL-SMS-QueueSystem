@@ -1,18 +1,27 @@
-#include <Arduino.h>
+#include <iostream>
+#include <string>
+#include <winsock2.h>
+#include "App.h"
 
-// put function declarations here:
-int myFunction(int, int);
+using namespace std;
 
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
-}
+int main(){
+    WSADATA wsaData;
+    if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0){
+        cout << "! WSAStartup failed" << endl;
+        return 1;
+    }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+    string projects[] = {"86!", "Frisson", "Desk Drawer"};
+    App app(projects, 3);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+    string input;
+    while(true){
+        app.displayOptions();
+        if(!getline(cin, input)) break;
+        app.handle(input);
+    }
+
+    WSACleanup();
+    return 0;
 }

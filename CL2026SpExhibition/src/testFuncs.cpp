@@ -1,26 +1,16 @@
 #include <iostream>
 using namespace std;
 
-// bool sanitizeNumber(string phoneNumber);
+// Test code — copy into main() to run
 
-int main(){
-
-
-
-    
-    return 0;
-}
-
-
-/* testing blocks, copy and paste main code into main(), uncomment the corresponding func implementation*/
 /* ------------------- test sanitizeNum -------------------------*/
-    //test cases:
-    /*
-    (214)-931-4749
-    2149314749
-    sjoijefioj!214!-931-47-4b9
-    +12948493928
-    */
+// test cases:
+/*
+(214)-931-4749
+2149314749
+sjoijefioj!214!-931-47-4b9
++12948493928
+*/
 
 // string input = "+1214-931---4749";
 // if(sanitizeNumber(input) == true){
@@ -28,8 +18,7 @@ int main(){
 // }
 // else{
 //     cout << "invalid" << endl;
-//}
-
+// }
 
 // bool sanitizeNumber(string phoneNumber){
 //     string sanitizedDigits;
