@@ -1,12 +1,13 @@
-#pragma once
+#ifndef APP_H
+#define APP_H
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <thread>
-#include <winsock2.h> //socket library
-#include <ws2tcpip.h> //needed for ipv6
-#include <atomic> //atomic is like "static" in java
-#include <nlohmann/json.hpp>
+#include <atomic>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include "GroupManager.h"
 #include "CParser.h"
 
@@ -69,5 +70,5 @@ class App{
     int _clientSocket;
     std::vector<GroupManager> _managers;
     CParser CParser;
-
+}
 #endif

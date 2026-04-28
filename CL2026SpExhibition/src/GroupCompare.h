@@ -1,5 +1,6 @@
-#pragma once
-#include <iostream>
+#ifndef GROUPCOMPARE_H
+#define GROUPCOMPARE_H
+
 #include "Group.h"
 
 class GroupCompare{

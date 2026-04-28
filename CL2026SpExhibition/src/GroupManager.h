@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GROUPMANAGER_H
+#define GROUPMANAGER_H
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
