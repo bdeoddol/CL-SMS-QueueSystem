@@ -2,24 +2,55 @@ package Rishaparser;
 
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 
 import com.opencsv.CSVReader;
 import com.google.gson.Gson;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+
+import java.net.ServerSocket;
+
 
 public class Parser {
+    //state
+    private static volatile boolean _paused;
+    // private static 
+
+
     private final String sheetUrl;
     private final Gson gson;
-    private volatile boolean paused = false;
     private int lastSeen = -1;
     private int lastFetch = -1;
     private int stableCount = 0;
     private static final int REQ_STABLE = 3;
+    
+
+    private static boolean _connected;
+    private static int _port;
+    private static DataInputStream _in;
+    private static DataOutputStream _out;
+    private static ServerSocket _server;
+    private static Socket _socketConnect;
+    
+
+    // private static Thread _receiveUserThread;
+    // receiveUserInstruct jobWork;
+    
 
     public Parser(String sheetUrl) {
-        this.sheetUrl = sheetUrl;
         this.gson = new Gson();
+
+        jobWork = new receiveUserInstruct();
+        _receiveUserThread = null;
+
+        this.sheetUrl = sheetUrl;
+        _connected = false;
+        _paused = false;
+
     }
 
     public ArrayList<FormContainer> fetchEntries() throws Exception {
@@ -50,7 +81,7 @@ public class Parser {
       public void run() throws Exception {
         startInputListener();
         while (true) {
-            if (!paused) {
+            if (!_paused) {
                 ArrayList<FormContainer> entries = fetchEntries();
                 int currentCount = entries.size();
 
@@ -89,8 +120,8 @@ public class Parser {
                 while (true) {
                     char key = (char) System.in.read();
                     if (key == ' ') {
-                        paused = !paused;
-                        System.out.println(paused ? "\n===paused===" : "\n===unpaused===");
+                        _paused = !_paused;
+                        System.out.println(_paused ? "\n===paused===" : "\n===unpaused===");
                     }
                 }
             } catch (IOException e) {
@@ -101,8 +132,65 @@ public class Parser {
         inputThread.start();
     }
 
-    public static void main(String[] args) throws Exception {
-        String url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFDUhAVVoYXpQvqKQ0FrBU_c3c5vPG-ImbMxqeZhKfz0gStUOADiTnmxlbn_q0ar_q8xCiffIr0UVk/pub?output=csv";
-        new Parser(url).run();
+
+    public void startUpServerSocket(int port){
+        _port = port;
+        try {
+            _server = new ServerSocket(_port);
+        } 
+        catch (IOException | IllegalArgumentException e) { //check serversocket documentation
+            System.out.println("An error has occured while calling startUpServerSocket. returning.....");
+        }
     }
+
+    public void awaitClientConnection(){
+        System.out.println("Awaiting client connection...");
+        try {
+            //https://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html#accept--
+            //.accept() is a blocking function that halts execution until a connection is made
+            _socketConnect = _server.accept(); 
+            System.out.println("A connection has been made on port: " + _port);
+            _in = new DataInputStream(_socketConnect.getInputStream());
+            _out = new DataOutputStream(_socketConnect.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("An error has occured awaiting a connection. Stopping attempt...");
+        }
+
+    }
+
+    public boolean isPaused(){
+        return _paused;
+    }
+
+    // public static void main(String[] args) throws Exception {
+    //     String url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFDUhAVVoYXpQvqKQ0FrBU_c3c5vPG-ImbMxqeZhKfz0gStUOADiTnmxlbn_q0ar_q8xCiffIr0UVk/pub?output=csv";
+    //     new Parser(url);
+    //     Parser.startUpServerSocket(800);
+    //     Parser.awaitClientConnection();
+
+    //     // new Parser(url).run();
+
+
+
+
+
+    //     int port = 8000;
+    //     int aNumber;
+    //     DataInputStream in;
+    //     DataOutputStream out;
+
+    //     ServerSocket server;
+    //     Socket socketConnect;
+
+    //     server = new ServerSocket(port);
+    //     socket = server.accept();
+
+    //     in = new DataInputStream(socket.getInputStream());
+    //     out = new DataOutputStream(socket.getOutputStream());
+
+    //     System.out.println(in.readByte());
+    //     out.writeDouble(aNumber);
+        
+
+    // }
 }
