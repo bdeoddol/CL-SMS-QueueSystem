@@ -20,6 +20,9 @@ int main(){
         app.displayOptions();
         if(!getline(cin, input)) break;
         app.handle(input);
+        cout << "Press any key to continue (then enter)" << endl;      
+        getline(cin, input);
+        cout << "\033[2J\033[H";
     }
 
     WSACleanup();
