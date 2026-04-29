@@ -4946,7 +4946,7 @@ NLOHMANN_JSON_NAMESPACE_END
 
 // include after macro_scope.hpp
 #ifdef JSON_HAS_CPP_17
-    #include <optional> // optional
+    #include <optional>
 #endif
 
 #if JSON_HAS_FILESYSTEM || JSON_HAS_EXPERIMENTAL_FILESYSTEM

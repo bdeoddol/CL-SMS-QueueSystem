@@ -67,8 +67,8 @@ class App{
     int _currProtocol;
     struct sockaddr_in6 _IPv6serverAddress;
     struct sockaddr_in _IPv4serverAddress;
-    int _clientSocket;
+    SOCKET _clientSocket;
     std::vector<GroupManager> _managers;
     CParser CParser;
-}
+};
 #endif

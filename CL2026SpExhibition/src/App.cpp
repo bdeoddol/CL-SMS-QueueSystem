@@ -1,4 +1,3 @@
-
 #include "App.h"
 #include "utilityFunc.h"
 #include <sstream>
@@ -93,7 +92,7 @@ void App::handle(string input){
             string manager_id = tokens[1];
             groupManagerStatus(stoi(manager_id));
         } else if(command == 3){
-            cout << "Connected" << boolalpha << isConnected() << endl;
+            cout << "Connected: " << boolalpha << isConnected() << endl;
         } else if(command == 4){
             if(tokens.size() < 2){
                 cout << "! Invalid command: missing s or p" << endl;
@@ -319,14 +318,14 @@ void App::receivingStream(){
             cout << "! Error within receive stream. Disconnecting and pausing parse... please reconnect again" << endl;
             this->_alive = false;
             this->_connected = false;
-            hi check this error messge//check for _connected, call disconnect() within main thread
+            //hi check this error messge, check for _connected, call disconnect() within main thread
             return;
         }
         else if(byte_count == 0){ 
             cout << "! Connected server has closed! Disconnecting and pausing parse... please reconnect again" << endl;
             this->_alive = false;
             this->_connected = false;
-            hi check this error messge//check for _connected, call disconnect() within MAIN thread
+            //hi check this error messge check for _connected, call disconnect() within MAIN thread
             return;
         }
 
