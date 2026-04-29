@@ -20,6 +20,7 @@ class App{
     3 = Desk Drawer
     */
     App(std::string* projects, int numProj);
+    ~App();
     void displayOptions();
     void handle(std::string input);
 
@@ -60,10 +61,18 @@ class App{
     void sendConfirmation(int ID);
     bool isConnected();
 
+    //from chatgpt
+    void listenArduino(); 
+    void startArduino();   // *** ADDED
+    void stopArduino();    // *** ADDED
+    std::atomic<bool> _arduinoListening;
+
     std::atomic<bool> _paused;
     std::atomic<bool> _alive;
     std::atomic<bool> _connected;
+    
     std::thread _receiveThread;
+    std::thread _listenArduino;
     int _currProtocol;
     struct sockaddr_in6 _IPv6serverAddress;
     struct sockaddr_in _IPv4serverAddress;

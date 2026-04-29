@@ -21,4 +21,11 @@ int parseProtocol(std::string protocol);
 
 bool sendWholeMessage(SOCKET socket, std::string msg);
 
+//from chatgpt /////////////////////////////////////////////////////////////////////////////////////
+HANDLE openSerial();
+
+bool configureSerial(HANDLE hSerial);
+
+std::string readLine(HANDLE hSerial);
+
 #endif
