@@ -90,8 +90,8 @@ void App::handle(string input){
                 cout << "! Invalid command: missing manager_id" << endl;
                 return;
             }
-            int manager_id = stoi(tokens[1]);
-            groupManagerStatus(manager_id);
+            string manager_id = tokens[1];
+            groupManagerStatus(stoi(manager_id));
         } else if(command == 3){
             cout << "Connected" << boolalpha << isConnected() << endl;
         } else if(command == 4){
