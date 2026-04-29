@@ -1,5 +1,6 @@
 #include "App.h"
 #include "utilityFunc.h"
+#include <tabulate/table.hpp>
 #include <sstream>
 #include <thread>
 #include <winsock2.h> //socket library
@@ -13,7 +14,7 @@
 #include "Group.h"
 #include <nlohmann/json.hpp>
 
-
+using namespace tabulate;
 using namespace std;
 
 
@@ -485,6 +486,32 @@ void App::groupManagerStatus(int projID){
     cout << "! No GroupManager for projectID: " << projID << " found" << endl;
 }
 
+void App::programStatus(){
+    Table groups;
+    groups.add_row({"Group Name", "Project", "Group Size","Primary Phone", "Secondary Phones" });
+    groups[0].format().font_style({FontStyle::bold});
+    for(int i = 0; i < _managers.size(); i++){
+        GroupManager* curr = _managers[i];
+        const vector<Group>& currProject = curr->getActiveGroups();
+        for(int j = 0; j < currProject.size(); j++){
+            const Group& g = currProject[j];
+            string secondaryNums = secondaryNumHelper(g.getSecondaryNumbers());
+            groups.add_row({g.getPrimaryName(), g.getAwaitingProject(), to_string(g.getGroupSize()), g.getPrimaryNumber(), secondaryNums});
+        }
+    }
+    cout << groups;
+}
+
+string App::secondaryNumHelper(vector<std::string> numbers){
+    string nums = "";
+    for(int i = 0; i < numbers.size(); i++){
+        nums += numbers[i];
+        if(i < numbers.size() - 1){
+            nums += "\n";
+        }
+    }
+    return nums;
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 void App::listenArduino() {
@@ -560,3 +587,4 @@ void App::stopArduino(){ // *** ADDED
 
     cout << "! Arduino listener stopped\n";
 }
+
