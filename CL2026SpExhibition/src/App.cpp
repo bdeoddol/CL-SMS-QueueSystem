@@ -42,6 +42,20 @@ App::App(string* projects, int numProj){
         GroupManager manager = GroupManager(i+1, projects[i]); //create a set of group managers with their projectIds and names. add to the vector.
         _managers.push_back(manager);
     }
+
+    this->_arduinoListening = true;
+    this->_listenArduino = thread(&App::listenArduino, this);
+    
+
+}
+
+App::~App(){ // *** ADDED
+    _arduinoListening = false; // *** ADDED
+    if (_listenArduino.joinable()) { // *** ADDED
+        _listenArduino.join();       // *** ADDED
+    }                               // *** ADDED
+
+    disconnect(); // *** ADDED: ensure socket thread is also cleaned up
 }
 
 void App::displayOptions(){
@@ -263,7 +277,7 @@ void App::reconnect(){
         return;
     }
 
-    bool isConnected;
+    bool isConnected = false;
     if(this->_currProtocol == AF_INET){
         isConnected = attemptConnection(this->_currProtocol, (struct sockaddr *)&_IPv4serverAddress, sizeof(_IPv4serverAddress));
     }
@@ -309,6 +323,7 @@ void App::receivingStream(){
     int confirmID;
     ns::FormContainer fc;
     int currentclientSocket = this->_clientSocket;
+    if (currentclientSocket == INVALID_SOCKET) return;
     while((this->_alive == true) && (this->_connected == true) ){
         if(this->_paused == true){
             Sleep(100);
@@ -358,6 +373,9 @@ void App::receivingStream(){
                         break;
                     }
                 }
+            }
+            else if(fc.getFullName().empty() || fc.getPrimaryNumber().empty()) { //skip bad data
+                continute;
             }
             if(fc.getMsgID() >= 0){
                 confirmID = fc.getMsgID();
@@ -465,3 +483,27 @@ void App::groupManagerStatus(int projID){
     }
     cout << "! No GroupManager for projectID: " << projID << " found" << endl;
 }
+
+void App::listenArduino() {
+    HANDLE serial = openSerial("COM3");
+
+    if (serial == INVALID_HANDLE_VALUE) return;
+    if (!configureSerial(serial)) return;
+
+    while (_arduinoListening == true) {
+        std::string msg = readLine(serial);
+
+        if (msg == "86!(LED 1) requests new group") {
+            pop(1);
+        }
+        else if (msg == "Frisson(LED 2) requests new group") {
+            pop(2);
+        }
+        else if(msg == "Desk Drawer(LED 3) requests new group"){
+            pop(3);
+        }
+    }
+
+    CloseHandle(serial);
+}
+

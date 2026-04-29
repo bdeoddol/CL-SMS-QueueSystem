@@ -60,10 +60,15 @@ class App{
     void sendConfirmation(int ID);
     bool isConnected();
 
+    //from chatgpt
+    void listenArduino(); 
+
     std::atomic<bool> _paused;
     std::atomic<bool> _alive;
     std::atomic<bool> _connected;
+    std::atomic<bool> _arduinoListening;
     std::thread _receiveThread;
+    std::thread _listenArduino;
     int _currProtocol;
     struct sockaddr_in6 _IPv6serverAddress;
     struct sockaddr_in _IPv4serverAddress;

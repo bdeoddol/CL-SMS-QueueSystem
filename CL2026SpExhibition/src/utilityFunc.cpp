@@ -6,6 +6,10 @@
 #include <iostream>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <windows.h> //connect, set up, and configure serial
+
+
+
 using namespace std;
 
 int generate4digNum(){
@@ -74,4 +78,64 @@ bool sendWholeMessage(SOCKET socket, string msg){
     }
 
     return true;
+}
+
+//from chatgpt
+
+HANDLE openSerial(const char* portName) {
+    HANDLE hSerial = CreateFileW(
+        L"COM3",                 // "COM4"
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        0,
+        OPEN_EXISTING,
+        0,
+        0
+    );
+
+    if (hSerial == INVALID_HANDLE_VALUE) {
+        cout << "Error opening serial port\n";
+        return INVALID_HANDLE_VALUE;
+    }
+
+    return hSerial;
+}
+
+bool configureSerial(HANDLE hSerial) {
+    DCB dcbSerialParams = {0};
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+
+    if (!GetCommState(hSerial, &dcbSerialParams)) {
+        cout << "Error getting state\n";
+        return false;
+    }
+
+    dcbSerialParams.BaudRate = CBR_9600;
+    dcbSerialParams.ByteSize = 8;
+    dcbSerialParams.StopBits = ONESTOPBIT;
+    dcbSerialParams.Parity   = NOPARITY;
+
+    if (!SetCommState(hSerial, &dcbSerialParams)) {
+        cout << "Error setting state\n";
+        return false;
+    }
+
+    return true;
+}
+
+string readLine(HANDLE hSerial) {
+    char buffer[1];
+    DWORD bytesRead;
+    string result;
+
+    while (true) {
+        if (ReadFile(hSerial, buffer, 1, &bytesRead, NULL)) {
+            if (bytesRead > 0) {
+                if (buffer[0] == '\n') break;
+                result += buffer[0];
+            }
+        }
+    }
+
+    return result;
 }
