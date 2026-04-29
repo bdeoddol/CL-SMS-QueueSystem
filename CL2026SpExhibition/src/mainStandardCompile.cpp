@@ -22,7 +22,12 @@ int main(){
         app.handle(input);
         cout << "Press any key to continue (then enter)" << endl;      
         getline(cin, input);
-        cout << "\033[2J\033[H";
+        //clear
+        #ifdef _WIN32
+            std::system("cls");   // Windows command
+        #else
+            std::system("clear"); // Linux/macOS command
+        #endif
     }
 
     WSACleanup();
