@@ -1,4 +1,3 @@
-
 #include "App.h"
 #include "utilityFunc.h"
 #include <sstream>
@@ -105,7 +104,7 @@ void App::handle(string input){
             string manager_id = tokens[1];
             groupManagerStatus(stoi(manager_id));
         } else if(command == 3){
-            cout << "Connected" << boolalpha << isConnected() << endl;
+            cout << "Connected: " << boolalpha << isConnected() << endl;
         } else if(command == 4){
             if(tokens.size() < 2){
                 cout << "! Invalid command: missing s or p" << endl;
