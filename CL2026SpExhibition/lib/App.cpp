@@ -490,7 +490,7 @@ void App::programStatus(){
         for(int j = 0; j < currProject.size(); j++){
             const Group& g = currProject[j];
             string secondaryNums = secondaryNumHelper(g.getSecondaryNumbers());
-            groups.add_row({g.getPrimaryName(), g.getAwaitingProject(), to_string(g.getGroupSize()), g.getPrimaryNumber(), secondaryNums});
+            groups.add_row({g.getPrimaryName(), g.getAwaitingProject(), to_string(g.getGroupSize()), g.getNumber(), secondaryNums});
         }
     }
     cout << groups;
