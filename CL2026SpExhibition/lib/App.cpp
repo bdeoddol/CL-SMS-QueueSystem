@@ -1,5 +1,6 @@
 #include "App.h"
 #include "utilityFunc.h"
+#include <tabulate/table.hpp>
 #include <sstream>
 #include <thread>
 #include <winsock2.h> //socket library
@@ -13,7 +14,7 @@
 #include "Group.h"
 #include <nlohmann/json.hpp>
 
-
+using namespace tabulate;
 using namespace std;
 
 
@@ -412,11 +413,11 @@ void App::startReceiveThread() {
 ////there will be two valid types of user defined that can be sent, a pause parser command (p), a start parser command(s)
 void App::userSendStream(string cmd){
     string message = cmd;
-    if(message.empty() == true && (message.size() > 1)){
-        cout << "! Empty command, type a valid command" << endl;
-        return;   
-    }
-    else if( message[0] == 'p'){
+    // if(message.empty() == true && (message.size() > 1)){
+    //     cout << "! Empty command, type a valid command" << endl;
+    //     return;   
+    // } check is implemented in handle functinon already, also this is wrong lol 
+    if( message[0] == 'p'){
         this->_paused = true;
     }
     else if(message[0] == 's'){
@@ -460,16 +461,6 @@ bool App::isConnected(){
     return _connected;
 }
 
-void App::programStatus(){
-    cout << "Connected: " << boolalpha << _connected.load() << endl;
-    cout << "Paused:    " << boolalpha << _paused.load() << endl;
-    cout << "Managers:  " << _managers.size() << endl;
-    for(int i = 0; i < (int)_managers.size(); i++){
-        cout << "  [" << _managers[i].getProjectId() << "] " << _managers[i].getProjectName()
-             << "  queue size: " << _managers[i].getActiveGroups().size() << endl;
-    }
-}
-
 void App::groupManagerStatus(int projID){
     for(int i = 0; i < (int)_managers.size(); i++){
         if(_managers[i].getProjectId() == projID){
@@ -485,6 +476,36 @@ void App::groupManagerStatus(int projID){
     cout << "! No GroupManager for projectID: " << projID << " found" << endl;
 }
 
+void App::programStatus(){
+    cout << "Connected: " << boolalpha << _connected.load() << endl;
+    cout << "Paused:    " << boolalpha << _paused.load() << endl;
+    cout << "Managers:  " << _managers.size() << endl;
+
+    Table groups;
+    groups.add_row({"Group Name", "Project", "Group Size","Primary Phone", "Secondary Phones" });
+    groups[0].format().font_style({FontStyle::bold});
+    for(int i = 0; i < _managers.size(); i++){
+        GroupManager curr = _managers[i];
+        const vector<Group>& currProject = curr.getActiveGroups();
+        for(int j = 0; j < currProject.size(); j++){
+            const Group& g = currProject[j];
+            string secondaryNums = secondaryNumHelper(g.getSecondaryNumbers());
+            groups.add_row({g.getPrimaryName(), g.getAwaitingProject(), to_string(g.getGroupSize()), g.getPrimaryNumber(), secondaryNums});
+        }
+    }
+    cout << groups;
+}
+
+string App::secondaryNumHelper(vector<std::string> numbers){
+    string nums = "";
+    for(int i = 0; i < numbers.size(); i++){
+        nums += numbers[i];
+        if(i < numbers.size() - 1){
+            nums += "\n";
+        }
+    }
+    return nums;
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 void App::listenArduino() {
@@ -560,3 +581,4 @@ void App::stopArduino(){ // *** ADDED
 
     cout << "! Arduino listener stopped\n";
 }
+

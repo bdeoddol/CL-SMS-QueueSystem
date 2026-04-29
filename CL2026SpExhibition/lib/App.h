@@ -27,6 +27,7 @@ class App{
   private:
 
     void programStatus();
+    std::string secondaryNumHelper(std::vector<std::string>);
     void groupManagerStatus(int projID);
 
     bool pauseParse();
