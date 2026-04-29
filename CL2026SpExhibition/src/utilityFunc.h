@@ -1,5 +1,6 @@
-#pragma once
-#include "QueueObject.h"
+#ifndef UTILITYFUNC_H
+#define UTILITYFUNC_H
+
 #include "Group.h"
 #include <string>
 #include <vector>
