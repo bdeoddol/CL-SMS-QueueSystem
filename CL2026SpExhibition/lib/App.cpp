@@ -519,14 +519,14 @@ void App::listenArduino() {
         cout << "Received: [" << msg << "] size=" << msg.size() << endl;
 
         // *** ADDED: robust matching (DO NOT use ==)
-        if (msg.find("86!") != std::string::npos) {
+        if (msg.find("8") != std::string::npos) {
             pop(1);
             cout << "! hi confirm" << endl;
         }
-        else if (msg.find("Frisson") != std::string::npos) {
+        else if (msg.find("F") != std::string::npos) {
             pop(2);
         }
-        else if (msg.find("Desk Drawer") != std::string::npos) {
+        else if (msg.find("D") != std::string::npos) {
             pop(3);
         }
     }

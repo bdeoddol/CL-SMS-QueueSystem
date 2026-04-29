@@ -8,8 +8,10 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/include",
                 "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/src",
+                "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/.pio/libdeps/uno/nlohmann-json/single_include",
+                "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/.pio/libdeps/uno/ArduinoSTL/src",
+                "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/include",
                 "C:/Users/Jammi/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/Jammi/.platformio/packages/framework-arduino-avr/variants/standard",
                 "C:/Users/Jammi/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
@@ -22,8 +24,10 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/include",
                     "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/src",
+                    "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/.pio/libdeps/uno/nlohmann-json/single_include",
+                    "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/.pio/libdeps/uno/ArduinoSTL/src",
+                    "C:/Users/Jammi/OneDrive/Documents/Coding/Legit/CL-SMS-QueueSystem/CL2026SpExhibition/include",
                     "C:/Users/Jammi/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/Jammi/.platformio/packages/framework-arduino-avr/variants/standard",
                     "C:/Users/Jammi/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
