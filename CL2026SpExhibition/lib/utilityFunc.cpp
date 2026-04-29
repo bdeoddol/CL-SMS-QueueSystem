@@ -80,11 +80,11 @@ bool sendWholeMessage(SOCKET socket, string msg){
     return true;
 }
 
-//from chatgpt
+//from chatgpt /////////////////////////////////////////////////////////////////
 
-HANDLE openSerial(const char* portName) {
+HANDLE openSerial() {
     HANDLE hSerial = CreateFileW(
-        L"COM3",                 // "COM4"
+        L"\\\\.\\COM3",   //for COM3
         GENERIC_READ | GENERIC_WRITE,
         0,
         0,
@@ -123,17 +123,15 @@ bool configureSerial(HANDLE hSerial) {
     return true;
 }
 
-string readLine(HANDLE hSerial) {
-    char buffer[1];
+string readLine(HANDLE serial) {
+    char c;
     DWORD bytesRead;
-    string result;
+    std::string result;
 
     while (true) {
-        if (ReadFile(hSerial, buffer, 1, &bytesRead, NULL)) {
-            if (bytesRead > 0) {
-                if (buffer[0] == '\n') break;
-                result += buffer[0];
-            }
+        if (ReadFile(serial, &c, 1, &bytesRead, NULL) && bytesRead > 0) {
+            if (c == '\n') break;
+            result += c;
         }
     }
 

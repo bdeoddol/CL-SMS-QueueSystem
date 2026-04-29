@@ -20,6 +20,7 @@ class App{
     3 = Desk Drawer
     */
     App(std::string* projects, int numProj);
+    ~App();
     void displayOptions();
     void handle(std::string input);
 
@@ -62,11 +63,14 @@ class App{
 
     //from chatgpt
     void listenArduino(); 
+    void startArduino();   // *** ADDED
+    void stopArduino();    // *** ADDED
+    std::atomic<bool> _arduinoListening;
 
     std::atomic<bool> _paused;
     std::atomic<bool> _alive;
     std::atomic<bool> _connected;
-    std::atomic<bool> _arduinoListening;
+    
     std::thread _receiveThread;
     std::thread _listenArduino;
     int _currProtocol;
@@ -75,5 +79,5 @@ class App{
     int _clientSocket;
     std::vector<GroupManager> _managers;
     CParser CParser;
-}
+};
 #endif

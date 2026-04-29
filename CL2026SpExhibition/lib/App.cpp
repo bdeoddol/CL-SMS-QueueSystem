@@ -42,19 +42,15 @@ App::App(string* projects, int numProj){
         GroupManager manager = GroupManager(i+1, projects[i]); //create a set of group managers with their projectIds and names. add to the vector.
         _managers.push_back(manager);
     }
+    ///////////////////////////////
 
-    this->_arduinoListening = true;
-    this->_listenArduino = thread(&App::listenArduino, this);
+    this->_arduinoListening = true; // *** ADDED
     
 
 }
 
 App::~App(){ // *** ADDED
-    _arduinoListening = false; // *** ADDED
-    if (_listenArduino.joinable()) { // *** ADDED
-        _listenArduino.join();       // *** ADDED
-    }                               // *** ADDED
-
+    stopArduino();
     disconnect(); // *** ADDED: ensure socket thread is also cleaned up
 }
 
@@ -79,6 +75,8 @@ void App::displayOptions(){
     cout << "    9. Pop from project queue  <project_id>" << endl; //done
     cout << "    10. Show all active groups <project_id>" << endl; //done? i think?
     cout << "    11. Exit program" << endl; //done? i think?
+    cout << "    12. Start Arduino Listener" << endl; 
+    cout << "    13. Stop Arduino Listener" << endl; 
     cout << "=============================================" << endl;
     cout << "Enter command number: ";
 }
@@ -145,6 +143,10 @@ void App::handle(string input){
             showActiveGroups(stoi(tokens[1]));
         } else if(command == 11){
             exit(0);
+        }else if(command == 12){ // *** ADDED
+            startArduino();
+        }else if(command == 13){ // *** ADDED
+            stopArduino();
         } else {
             cout << "Invalid command" << endl;
             return;
@@ -334,14 +336,14 @@ void App::receivingStream(){
             cout << "! Error within receive stream. Disconnecting and pausing parse... please reconnect again" << endl;
             this->_alive = false;
             this->_connected = false;
-            hi check this error messge//check for _connected, call disconnect() within main thread
+            // hi check this error messge//check for _connected, call disconnect() within main thread
             return;
         }
         else if(byte_count == 0){ 
             cout << "! Connected server has closed! Disconnecting and pausing parse... please reconnect again" << endl;
             this->_alive = false;
             this->_connected = false;
-            hi check this error messge//check for _connected, call disconnect() within MAIN thread
+            // hi check this error messge//check for _connected, call disconnect() within MAIN thread
             return;
         }
 
@@ -375,7 +377,7 @@ void App::receivingStream(){
                 }
             }
             else if(fc.getFullName().empty() || fc.getPrimaryNumber().empty()) { //skip bad data
-                continute;
+                continue;
             }
             if(fc.getMsgID() >= 0){
                 confirmID = fc.getMsgID();
@@ -484,22 +486,47 @@ void App::groupManagerStatus(int projID){
     cout << "! No GroupManager for projectID: " << projID << " found" << endl;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 void App::listenArduino() {
-    HANDLE serial = openSerial("COM3");
+    HANDLE serial = openSerial(); // *** ADDED: correct port format
 
-    if (serial == INVALID_HANDLE_VALUE) return;
-    if (!configureSerial(serial)) return;
+    if (serial == INVALID_HANDLE_VALUE) {
+        cout << "! Failed to open serial port" << endl;
+        return;
+    }
 
-    while (_arduinoListening == true) {
+    if (!configureSerial(serial)) {
+        cout << "! Failed to configure serial port" << endl;
+        CloseHandle(serial);
+        return;
+    }
+
+    Sleep(2000); // *** ADDED: allow Arduino reset
+
+    while (_arduinoListening.load()) {
+
         std::string msg = readLine(serial);
 
-        if (msg == "86!(LED 1) requests new group") {
+        // *** ADDED: remove ALL newline / carriage return junk
+        msg.erase(std::remove_if(msg.begin(), msg.end(),
+            [](unsigned char c) {
+                return c == '\r' || c == '\n';
+            }),
+            msg.end());
+
+        // *** ADDED: debug output
+        cout << "Received: [" << msg << "] size=" << msg.size() << endl;
+
+        // *** ADDED: robust matching (DO NOT use ==)
+        if (msg.find("86!") != std::string::npos) {
             pop(1);
+            cout << "! hi confirm" << endl;
         }
-        else if (msg == "Frisson(LED 2) requests new group") {
+        else if (msg.find("Frisson") != std::string::npos) {
             pop(2);
         }
-        else if(msg == "Desk Drawer(LED 3) requests new group"){
+        else if (msg.find("Desk Drawer") != std::string::npos) {
             pop(3);
         }
     }
@@ -507,3 +534,30 @@ void App::listenArduino() {
     CloseHandle(serial);
 }
 
+void App::startArduino(){ // *** ADDED
+    if (_arduinoListening){
+        cout << "! Arduino listener already running\n";
+        return;
+    }
+
+    _arduinoListening = true;
+    _listenArduino = std::thread(&App::listenArduino, this);
+
+    cout << "! Arduino listener started\n";
+}
+
+
+void App::stopArduino(){ // *** ADDED
+    if (!_arduinoListening){
+        cout << "! Arduino listener already stopped\n";
+        return;
+    }
+
+    _arduinoListening = false;
+
+    if (_listenArduino.joinable()){
+        _listenArduino.join();
+    }
+
+    cout << "! Arduino listener stopped\n";
+}

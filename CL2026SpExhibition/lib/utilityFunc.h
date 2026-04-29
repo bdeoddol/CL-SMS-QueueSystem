@@ -21,8 +21,8 @@ int parseProtocol(std::string protocol);
 
 bool sendWholeMessage(SOCKET socket, std::string msg);
 
-//from chatgpt
-HANDLE openSerial(const char* portName);
+//from chatgpt /////////////////////////////////////////////////////////////////////////////////////
+HANDLE openSerial();
 
 bool configureSerial(HANDLE hSerial);
 
