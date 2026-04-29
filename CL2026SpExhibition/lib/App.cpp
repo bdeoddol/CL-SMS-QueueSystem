@@ -413,11 +413,11 @@ void App::startReceiveThread() {
 ////there will be two valid types of user defined that can be sent, a pause parser command (p), a start parser command(s)
 void App::userSendStream(string cmd){
     string message = cmd;
-    if(message.empty() == true && (message.size() > 1)){
-        cout << "! Empty command, type a valid command" << endl;
-        return;   
-    }
-    else if( message[0] == 'p'){
+    // if(message.empty() == true && (message.size() > 1)){
+    //     cout << "! Empty command, type a valid command" << endl;
+    //     return;   
+    // } check is implemented in handle functinon already, also this is wrong lol 
+    if( message[0] == 'p'){
         this->_paused = true;
     }
     else if(message[0] == 's'){
@@ -461,16 +461,6 @@ bool App::isConnected(){
     return _connected;
 }
 
-void App::programStatus(){
-    cout << "Connected: " << boolalpha << _connected.load() << endl;
-    cout << "Paused:    " << boolalpha << _paused.load() << endl;
-    cout << "Managers:  " << _managers.size() << endl;
-    for(int i = 0; i < (int)_managers.size(); i++){
-        cout << "  [" << _managers[i].getProjectId() << "] " << _managers[i].getProjectName()
-             << "  queue size: " << _managers[i].getActiveGroups().size() << endl;
-    }
-}
-
 void App::groupManagerStatus(int projID){
     for(int i = 0; i < (int)_managers.size(); i++){
         if(_managers[i].getProjectId() == projID){
@@ -487,12 +477,16 @@ void App::groupManagerStatus(int projID){
 }
 
 void App::programStatus(){
+    cout << "Connected: " << boolalpha << _connected.load() << endl;
+    cout << "Paused:    " << boolalpha << _paused.load() << endl;
+    cout << "Managers:  " << _managers.size() << endl;
+
     Table groups;
     groups.add_row({"Group Name", "Project", "Group Size","Primary Phone", "Secondary Phones" });
     groups[0].format().font_style({FontStyle::bold});
     for(int i = 0; i < _managers.size(); i++){
-        GroupManager* curr = _managers[i];
-        const vector<Group>& currProject = curr->getActiveGroups();
+        GroupManager curr = _managers[i];
+        const vector<Group>& currProject = curr.getActiveGroups();
         for(int j = 0; j < currProject.size(); j++){
             const Group& g = currProject[j];
             string secondaryNums = secondaryNumHelper(g.getSecondaryNumbers());
