@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 public class GsonChecker {  
     public static void main(String[] args) {
         Gson gson = new Gson();
-        System.out.println("works");
-    }.vscode
+        System.out.println("works");  
+    }
+
 }

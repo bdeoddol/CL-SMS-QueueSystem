@@ -3,13 +3,13 @@ package Rishaparser;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 
 import com.opencsv.CSVReader;
 import com.google.gson.Gson;
 import java.io.DataInputStream;
-import java.io.DataOutput;
+// import java.io.DataOutput;
 import java.io.DataOutputStream;
 
 import java.net.ServerSocket;
@@ -62,7 +62,7 @@ public class Parser {
 
     public ArrayList<FormContainer> fetchEntries(String url) throws Exception {
         String noCacheUrlPlease = url + "&t=" + System.currentTimeMillis();
-        CSVReader csvReader = new CSVReader(new InputStreamReader((new URL(noCacheUrlPlease)).openStream()));
+        CSVReader csvReader = new CSVReader(new InputStreamReader(URI.create(noCacheUrlPlease).toURL().openStream()));
         ArrayList<FormContainer> entries = new ArrayList<>();
         boolean firstLine = true;
         int msgInc = -1;
@@ -119,7 +119,7 @@ public class Parser {
                     sendToClient(json);
                 }
             }
-            Thread.sleep(3000);
+            Thread.sleep(500);
         }
     }
 
