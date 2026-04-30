@@ -484,7 +484,6 @@ void App::programStatus(){
     Table groups;
     groups.add_row({"Group Name", "Project", "Group Size","Primary Phone", "Secondary Phones" });
     groups[0].format().font_style({FontStyle::bold});
-    cout << groups;
     for(int i = 0; i < (int)_managers.size(); i++){
         const GroupManager& curr = _managers[i];
         const vector<Group>& currProject = curr.getActiveGroups();
@@ -494,7 +493,7 @@ void App::programStatus(){
             groups.add_row({g.getPrimaryName(), g.getAwaitingProject(), to_string(g.getGroupSize()), g.getPrimaryNumber(), secondaryNums});
         }
     }
-    cout << groups;
+    cout << groups << endl;
 }
 
 string App::secondaryNumHelper(vector<std::string> numbers){
@@ -506,6 +505,14 @@ string App::secondaryNumHelper(vector<std::string> numbers){
         }
     }
     return nums;
+}
+
+void App::clearScreen(){
+    #ifdef _WIN32
+        std::system("cls");   // Windows command
+    #else
+        std::system("clear"); // Linux/macOS command
+    #endif
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
