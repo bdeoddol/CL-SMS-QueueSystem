@@ -84,7 +84,7 @@ bool sendWholeMessage(SOCKET socket, string msg){
 
 HANDLE openSerial() {
     HANDLE hSerial = CreateFileW(
-        L"\\\\.\\COM3",   //for COM3
+        L"\\\\.\\COM7",   //for COM3
         GENERIC_READ | GENERIC_WRITE,
         0,
         0,

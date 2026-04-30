@@ -23,13 +23,12 @@ class App{
     ~App();
     void displayOptions();
     void handle(std::string input);
+    void clearScreen();
 
   private:
 
     void programStatus();
     std::string secondaryNumHelper(std::vector<std::string>);
-    
-    void clearScreen();
 
     void groupManagerStatus(int projID);
 
