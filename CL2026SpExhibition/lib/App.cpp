@@ -65,7 +65,6 @@ void App::displayOptions(){
     cout << "---------------------------------------------" << endl;
     cout << "  PARSING" << endl;
     cout << "    4. Send Signal (s = start parse or p = pause parse)" << endl; //userSendStream, done
-    cout << "    5. Send confirmation to Java parser" << endl; //sendConfirmation
     cout << "---------------------------------------------" << endl;
     cout << "  SERVERS" << endl;
     cout << "    6. Connect to Java server  <host> <port> <IP Protocol>" << endl;
@@ -113,12 +112,6 @@ void App::handle(string input){
             }
             string cmd = tokens[1];
             userSendStream(cmd);
-        } else if(command == 5){
-            if(tokens.size() < 2){
-                cout << "! Invalid command: missing msgID" << endl;
-                return;
-            }
-            sendConfirmation(stoi(tokens[1]));
         } else if(command == 6){
             if(tokens.size() < 4){
                 cout << "! Invalid command: need hostIP, port number, protocol" << endl;
@@ -382,6 +375,7 @@ void App::receivingStream(){
             if(fc.getMsgID() >= 0){
                 confirmID = fc.getMsgID();
                 sendConfirmation(confirmID);
+                cout << "hi i just send back confirmID: " << confirmID << endl;
             }
         }        
     }

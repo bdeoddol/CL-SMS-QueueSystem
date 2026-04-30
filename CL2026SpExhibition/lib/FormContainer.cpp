@@ -23,11 +23,11 @@ namespace ns{
     //In function from_json, use function at() to access the object values rather than operator[]. Example: j["fullName"] = p._fullName; 
     //In case a key does not exist, at throws an exception that you can handle, whereas operator[] exhibits undefined behavior.
     void from_json(const json& j, FormContainer& p) {
-        j.at("fullName").get_to(p._fullName);
-        j.at("primaryPhoneNumber").get_to(p._primaryPhoneNumber);
-         j.at("projectID").get_to(p._projectID);
-         j.at("groupSize").get_to(p._groupSize);
-        j.at("msgID").get_to(p._msgID);
+        j.at("_fullName").get_to(p._fullName);
+        j.at("_primaryPhoneNumber").get_to(p._primaryPhoneNumber);
+         j.at("_projectID").get_to(p._projectID);
+         j.at("_groupSize").get_to(p._groupSize);
+        j.at("_msgID").get_to(p._msgID);
     }
 
 

@@ -21,11 +21,11 @@ public class Parser {
     // private static 
 
 
-    private final String sheetUrl;
+    private final String[] sheetUrls;
     private final Gson gson;
-    private int lastSeen = -1;
-    private int lastFetch = -1;
-    private int stableCount = 0;
+    private int[] lastSeen = new int[3];
+    private int[] lastFetch = new int[3];
+    private int[] stableCount = new int[3];
     private static final int REQ_STABLE = 3;
     
 
@@ -41,20 +41,27 @@ public class Parser {
     // receiveUserInstruct jobWork;
     
 
-    public Parser(String sheetUrl) {
+    public Parser(String[] sheetUrls) {
         this.gson = new Gson();
+        this.sheetUrls = sheetUrls;
+        
+        for(int i = 0; i < 3; i++) {
+            lastSeen[i] = -1;
+            lastFetch[i] = -1;
+            stableCount[i] = 0;
+        }
+        
 
-        jobWork = new receiveUserInstruct();
-        _receiveUserThread = null;
+        // jobWork = new receiveUserInstruct();
+        // _receiveUserThread = null;
 
-        this.sheetUrl = sheetUrl;
         _connected = false;
         _paused = false;
 
     }
 
-    public ArrayList<FormContainer> fetchEntries() throws Exception {
-        String noCacheUrlPlease = sheetUrl + "&t=" + System.currentTimeMillis();
+    public ArrayList<FormContainer> fetchEntries(String url) throws Exception {
+        String noCacheUrlPlease = url + "&t=" + System.currentTimeMillis();
         CSVReader csvReader = new CSVReader(new InputStreamReader((new URL(noCacheUrlPlease)).openStream()));
         ArrayList<FormContainer> entries = new ArrayList<>();
         boolean firstLine = true;
@@ -78,29 +85,39 @@ public class Parser {
         return entries;
     }
 
-      public void run() throws Exception {
+    public void run() throws Exception {
         startInputListener();
+        startReceiveListener();
         while (true) {
             if (!_paused) {
-                ArrayList<FormContainer> entries = fetchEntries();
-                int currentCount = entries.size();
+                ArrayList<FormContainer> allNewEntries = new ArrayList<>();
+                
+                for(int i = 0; i < 3; i++) {
+                    if(sheetUrls[i].isEmpty()) continue;
 
-                if(currentCount == lastFetch) {
-                    stableCount++;
-                } else {
-                    stableCount = 0;
-                }
+                    ArrayList<FormContainer> entries = fetchEntries(sheetUrls[i]);
+                    int currentCount = entries.size();
 
-                if(stableCount >= REQ_STABLE && currentCount > (lastSeen + 1)) {
-                    ArrayList<FormContainer> newEntries = new ArrayList<>();
-                    for(int i = lastSeen + 1; i < entries.size(); i++) {
-                        newEntries.add(entries.get(i));
+                    if(currentCount == lastFetch[i]) {
+                        stableCount[i]++;
+                    } else {
+                        stableCount[i] = 0;
                     }
-                    lastSeen = currentCount - 1;
-                    stableCount = 0;
-                    System.out.println(gson.toJson(newEntries));
+
+                    if(stableCount[i] >= REQ_STABLE && currentCount > (lastSeen[i] + 1)) {
+                        for(int j = lastSeen[i] + 1; j < entries.size(); j++) {
+                            allNewEntries.add(entries.get(j));
+                        }
+                        lastSeen[i] = currentCount - 1;
+                        stableCount[i] = 0;
+                    }
+                    lastFetch[i] = currentCount;
                 }
-                lastFetch = currentCount;
+                for(FormContainer entry : allNewEntries) {
+                    String json = gson.toJson(entry);
+                    System.out.println(json);
+                    sendToClient(json);
+                }
             }
             Thread.sleep(3000);
         }
@@ -112,7 +129,61 @@ public class Parser {
         } catch (NumberFormatException e) {
             return defaultVal;
         }
-}
+    }
+
+    public void sendToClient(String json) {
+        if(_out == null) {
+            System.out.println("!!! out is null; wrong run order");
+            return;
+        }
+        
+        try {
+            _out.writeBytes(json + "\n");
+            _out.flush();
+            System.out.println("sent");
+        } catch (IOException e) {
+            System.out.println("! Error sending to client");
+        }
+    }
+
+    public void startReceiveListener() {
+        Thread receiveThread = new Thread(() ->  {
+            try {
+                StringBuilder buffer = new StringBuilder();
+                int b;
+                while((b = _in.read()) != -1) {
+                    char c = (char) b;
+                    if(c == '\n') {
+                        String msg = buffer.toString().trim();
+                        buffer.setLength(0);
+
+                        if(msg.startsWith("c-")) {
+                            try {
+                                int confirmedID = Integer.parseInt(msg.substring(2));
+                                System.out.println("Confirmed msgID: " + confirmedID);
+                            } catch(NumberFormatException e) {
+                                System.out.println("! Bad confirmation key");
+                            }
+                        } else if(msg.equals("p")) {
+                            _paused = true;
+                            System.out.println("===paused===");
+                        } else if(msg.equals("s")) {
+                            _paused = false;
+                            System.out.println("===unpaused===");
+                        }
+                    } else {
+                        buffer.append(c);
+                    }
+                }
+            } catch(IOException e) {
+                System.out.println("! Receiver listener error: " + e.getMessage());
+            }
+        });
+        receiveThread.setDaemon(true);
+        receiveThread.start();
+    }
+
+    
 
     public void startInputListener() {
         Thread inputThread = new Thread(() -> {
@@ -152,6 +223,7 @@ public class Parser {
             System.out.println("A connection has been made on port: " + _port);
             _in = new DataInputStream(_socketConnect.getInputStream());
             _out = new DataOutputStream(_socketConnect.getOutputStream());
+            _connected = true;
         } catch (IOException e) {
             System.out.println("An error has occured awaiting a connection. Stopping attempt...");
         }

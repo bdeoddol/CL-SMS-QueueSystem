@@ -7,33 +7,36 @@ import java.net.Socket;
 
 public class Main {
         public static void main(String[] args) throws Exception {
-        String url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFDUhAVVoYXpQvqKQ0FrBU_c3c5vPG-ImbMxqeZhKfz0gStUOADiTnmxlbn_q0ar_q8xCiffIr0UVk/pub?output=csv";
-        Parser MainParser = new Parser(url);
-        MainParser.startUpServerSocket(800);
-        MainParser.awaitClientConnection();
+        String frUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSXeOhlScR5caXUwFzHc0nqhQdjbzDZvouMhqR7-lE-0DgI_E1T3xHAedY_QAqSkxTlioNPrHS5dyMr/pub?gid=1347883480&single=true&output=csv";
+        String esUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSXeOhlScR5caXUwFzHc0nqhQdjbzDZvouMhqR7-lE-0DgI_E1T3xHAedY_QAqSkxTlioNPrHS5dyMr/pub?gid=195098169&single=true&output=csv";
+        String ddUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSXeOhlScR5caXUwFzHc0nqhQdjbzDZvouMhqR7-lE-0DgI_E1T3xHAedY_QAqSkxTlioNPrHS5dyMr/pub?gid=1861108058&single=true&output=csv";
 
-        MainParser.run();
+        String[] urls = {frUrl, esUrl, ddUrl};
+        Parser mainParser = new Parser(urls);
+
+        mainParser.startUpServerSocket(800);
+        mainParser.awaitClientConnection();
+        mainParser.run();
 
 
 
 
+        // int port = 8000;
+        // int aNumber;
+        // DataInputStream in;
+        // DataOutputStream out;
 
-        int port = 8000;
-        int aNumber;
-        DataInputStream in;
-        DataOutputStream out;
+        // ServerSocket server;
+        // Socket socketConnect;
 
-        ServerSocket server;
-        Socket socketConnect;
+        // server = new ServerSocket(port);
+        // //socket = server.accept();
 
-        server = new ServerSocket(port);
-        socket = server.accept();
+        // in = new DataInputStream(socket.getInputStream());
+        // out = new DataOutputStream(socket.getOutputStream());
 
-        in = new DataInputStream(socket.getInputStream());
-        out = new DataOutputStream(socket.getOutputStream());
-
-        System.out.println(in.readByte());
-        out.writeDouble(aNumber);
+        // System.out.println(in.readByte());
+        // out.writeDouble(aNumber);
         
 
     }
