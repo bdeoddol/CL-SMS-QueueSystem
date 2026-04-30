@@ -23,11 +23,7 @@ int main(){
         cout << "Press any key to continue (then enter)" << endl;      
         getline(cin, input);
         //clear
-        #ifdef _WIN32
-            std::system("cls");   // Windows command
-        #else
-            std::system("clear"); // Linux/macOS command
-        #endif
+        app.clearScreen();
     }
 
     WSACleanup();

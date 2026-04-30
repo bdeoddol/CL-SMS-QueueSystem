@@ -28,6 +28,9 @@ class App{
 
     void programStatus();
     std::string secondaryNumHelper(std::vector<std::string>);
+    
+    void clearScreen();
+
     void groupManagerStatus(int projID);
 
     bool pauseParse();

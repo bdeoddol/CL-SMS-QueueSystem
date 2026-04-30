@@ -506,6 +506,14 @@ string App::secondaryNumHelper(vector<std::string> numbers){
     }
     return nums;
 }
+
+void App::clearScreen(){
+    #ifdef _WIN32
+        std::system("cls");   // Windows command
+    #else
+        std::system("clear"); // Linux/macOS command
+    #endif
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 void App::listenArduino() {
