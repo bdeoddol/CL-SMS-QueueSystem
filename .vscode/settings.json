@@ -1,6 +1,7 @@
 {
     "java.project.sourcePaths": [
-        "."
+        ".",
+        "lib"
     ],
     "java.project.referencedLibraries": [
         "lib/gson-2.13.2.jar",

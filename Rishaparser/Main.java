@@ -1,9 +1,6 @@
 package Rishaparser;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
+
 
 public class Main {
         public static void main(String[] args) throws Exception {
@@ -17,9 +14,6 @@ public class Main {
         mainParser.startUpServerSocket(800);
         mainParser.awaitClientConnection();
         mainParser.run();
-
-
-
 
         // int port = 8000;
         // int aNumber;

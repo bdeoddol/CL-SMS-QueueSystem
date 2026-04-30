@@ -234,35 +234,5 @@ public class Parser {
         return _paused;
     }
 
-    // public static void main(String[] args) throws Exception {
-    //     String url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFDUhAVVoYXpQvqKQ0FrBU_c3c5vPG-ImbMxqeZhKfz0gStUOADiTnmxlbn_q0ar_q8xCiffIr0UVk/pub?output=csv";
-    //     new Parser(url);
-    //     Parser.startUpServerSocket(800);
-    //     Parser.awaitClientConnection();
 
-    //     // new Parser(url).run();
-
-
-
-
-
-    //     int port = 8000;
-    //     int aNumber;
-    //     DataInputStream in;
-    //     DataOutputStream out;
-
-    //     ServerSocket server;
-    //     Socket socketConnect;
-
-    //     server = new ServerSocket(port);
-    //     socket = server.accept();
-
-    //     in = new DataInputStream(socket.getInputStream());
-    //     out = new DataOutputStream(socket.getOutputStream());
-
-    //     System.out.println(in.readByte());
-    //     out.writeDouble(aNumber);
-        
-
-    // }
 }

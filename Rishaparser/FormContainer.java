@@ -22,7 +22,7 @@ public class FormContainer {
    }
 
 
-   public String toString() {
+   public String convertToString() {
       return this._fullName + ", " + this._primaryPhoneNumber + ", size: " + this._groupSize + ", project id: " + this._projectID + ", msg id: " + this._msgID;
    }
 }

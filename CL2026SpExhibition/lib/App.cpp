@@ -369,7 +369,7 @@ void App::receivingStream(){
                     }
                 }
             }
-            else if(fc.getFullName().empty() || fc.getPrimaryNumber().empty()) { //skip bad data
+            else if(fc.getFullName().empty() || fc.getPrimaryNumber().empty()) { //skip   
                 continue;
             }
             if(fc.getMsgID() >= 0){
