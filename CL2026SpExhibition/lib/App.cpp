@@ -484,17 +484,16 @@ void App::programStatus(){
     Table groups;
     groups.add_row({"Group Name", "Project", "Group Size","Primary Phone", "Secondary Phones" });
     groups[0].format().font_style({FontStyle::bold});
-    cout << groups;
     for(int i = 0; i < (int)_managers.size(); i++){
-        const GroupManager& curr = _managers[i];
-        const vector<Group>& currProject = curr.getActiveGroups();
+        GroupManager curr = _managers[i];
+        vector<Group> currProject = curr.getActiveGroups();
         for(int j = 0; j < (int)currProject.size(); j++){
             const Group& g = currProject[j];
             string secondaryNums = secondaryNumHelper(g.getSecondaryNumbers());
             groups.add_row({g.getPrimaryName(), g.getAwaitingProject(), to_string(g.getGroupSize()), g.getNumber(), secondaryNums});
         }
     }
-    cout << groups;
+    cout << groups << endl;
 }
 
 string App::secondaryNumHelper(vector<std::string> numbers){
