@@ -54,6 +54,11 @@ Below are points of feedback and notes taken during it's deployment for future i
 
 * Ensure google form spreadsheet matches 1-to-1 fields found in the Java Parser and CPP Parser
     * Name -> Phone Number -> Project ID -> Group Size
+ 
+* Groups next in queue were not handled properly. Leading to multiple arriving
+   * Enforce via button based signal to request pop
+   * Request should provide relevant gorup information
+   * Allow to accept or reject the pop from queue
     * During deployment, the columsn found in the spreadsheet did not align with the comma seperated fields in the parser. Risha had to swap the fields in the object construction to fix this. Ensure that this is reverted.
 
 
