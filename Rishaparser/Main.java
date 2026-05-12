@@ -14,7 +14,7 @@ public class Main {
         String[] urls = {frUrl, esUrl, ddUrl};
         Parser mainParser = new Parser(urls);
 
-        mainParser.startUpServerSocket(800);
+        mainParser.startUpServerSocket(8000);
         mainParser.awaitClientConnection();
         mainParser.run();
 
