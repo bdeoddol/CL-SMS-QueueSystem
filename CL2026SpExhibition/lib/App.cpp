@@ -482,7 +482,7 @@ void App::programStatus(){
         GroupManager curr = _managers[i];
         vector<Group> currProject = curr.getActiveGroups();
         for(int j = 0; j < (int)currProject.size(); j++){
-            const Group& g = currProject[j];
+            const Group g = currProject[j];
             string secondaryNums = secondaryNumHelper(g.getSecondaryNumbers());
             groups.add_row({g.getPrimaryName(), g.getAwaitingProject(), to_string(g.getGroupSize()), g.getNumber(), secondaryNums});
         }
