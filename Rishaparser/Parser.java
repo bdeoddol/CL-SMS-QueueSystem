@@ -9,25 +9,21 @@ import java.util.ArrayList;
 import com.opencsv.CSVReader;
 import com.google.gson.Gson;
 import java.io.DataInputStream;
-// import java.io.DataOutput;
 import java.io.DataOutputStream;
 
 import java.net.ServerSocket;
 
 
 public class Parser {
-    //state
     private static volatile boolean _paused;
-    // private static 
-
 
     private final String[] sheetUrls;
     private final Gson gson;
+    private int globalMsgInc = 0;
     private int[] lastSeen = new int[3];
     private int[] lastFetch = new int[3];
     private int[] stableCount = new int[3];
     private static final int REQ_STABLE = 3;
-    
 
     private static boolean _connected;
     private static int _port;
@@ -35,29 +31,19 @@ public class Parser {
     private static DataOutputStream _out;
     private static ServerSocket _server;
     private static Socket _socketConnect;
-    
-
-    // private static Thread _receiveUserThread;
-    // receiveUserInstruct jobWork;
-    
 
     public Parser(String[] sheetUrls) {
         this.gson = new Gson();
         this.sheetUrls = sheetUrls;
-        
+
         for(int i = 0; i < 3; i++) {
             lastSeen[i] = -1;
             lastFetch[i] = -1;
             stableCount[i] = 0;
         }
-        
-
-        // jobWork = new receiveUserInstruct();
-        // _receiveUserThread = null;
 
         _connected = false;
         _paused = false;
-
     }
 
     public ArrayList<FormContainer> fetchEntries(String url) throws Exception {
@@ -65,7 +51,6 @@ public class Parser {
         CSVReader csvReader = new CSVReader(new InputStreamReader(URI.create(noCacheUrlPlease).toURL().openStream()));
         ArrayList<FormContainer> entries = new ArrayList<>();
         boolean firstLine = true;
-        int msgInc = -1;
 
         String[] fields;
         while((fields = csvReader.readNext()) != null) {
@@ -74,11 +59,13 @@ public class Parser {
                 continue;
             }
             if(fields.length < 5) continue;
-            msgInc++;
-            entries.add(new FormContainer(fields[1], fields[2], 
-                parseOrDefault(fields[3], 0), 
-                parseOrDefault(fields[4], 0), 
-                msgInc));
+            entries.add(new FormContainer(
+                fields[1],
+                fields[2],
+                parseOrDefault(fields[3], 0),
+                parseOrDefault(fields[4], 0),
+                -1  // placeholder, real ID assigned at send time
+            ));
         }
 
         csvReader.close();
@@ -91,7 +78,7 @@ public class Parser {
         while (true) {
             if (!_paused) {
                 ArrayList<FormContainer> allNewEntries = new ArrayList<>();
-                
+
                 for(int i = 0; i < 3; i++) {
                     if(sheetUrls[i].isEmpty()) continue;
 
@@ -106,13 +93,22 @@ public class Parser {
 
                     if(stableCount[i] >= REQ_STABLE && currentCount > (lastSeen[i] + 1)) {
                         for(int j = lastSeen[i] + 1; j < entries.size(); j++) {
-                            allNewEntries.add(entries.get(j));
+                            FormContainer entry = entries.get(j);
+                            FormContainer stamped = new FormContainer(
+                                entry.getFullName(),
+                                entry.getPrimaryNumber(),
+                                entry.getGroupSize(),
+                                entry.getProjectID(),
+                                globalMsgInc++
+                            );
+                            allNewEntries.add(stamped);
                         }
                         lastSeen[i] = currentCount - 1;
                         stableCount[i] = 0;
                     }
                     lastFetch[i] = currentCount;
                 }
+
                 for(FormContainer entry : allNewEntries) {
                     String json = gson.toJson(entry);
                     System.out.println(json);
@@ -136,7 +132,7 @@ public class Parser {
             System.out.println("!!! out is null; wrong run order");
             return;
         }
-        
+
         try {
             _out.writeBytes(json + "\n");
             _out.flush();
@@ -147,7 +143,7 @@ public class Parser {
     }
 
     public void startReceiveListener() {
-        Thread receiveThread = new Thread(() ->  {
+        Thread receiveThread = new Thread(() -> {
             try {
                 StringBuilder buffer = new StringBuilder();
                 int b;
@@ -183,8 +179,6 @@ public class Parser {
         receiveThread.start();
     }
 
-    
-
     public void startInputListener() {
         Thread inputThread = new Thread(() -> {
             try {
@@ -203,13 +197,11 @@ public class Parser {
         inputThread.start();
     }
 
-
     public void startUpServerSocket(int port){
         _port = port;
         try {
             _server = new ServerSocket(_port);
-        } 
-        catch (IOException | IllegalArgumentException e) { //check serversocket documentation
+        } catch (IOException | IllegalArgumentException e) {
             System.out.println("An error has occured while calling startUpServerSocket. returning.....");
         }
     }
@@ -217,9 +209,7 @@ public class Parser {
     public void awaitClientConnection(){
         System.out.println("Awaiting client connection...");
         try {
-            //https://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html#accept--
-            //.accept() is a blocking function that halts execution until a connection is made
-            _socketConnect = _server.accept(); 
+            _socketConnect = _server.accept();
             System.out.println("A connection has been made on port: " + _port);
             _in = new DataInputStream(_socketConnect.getInputStream());
             _out = new DataOutputStream(_socketConnect.getOutputStream());
@@ -227,12 +217,9 @@ public class Parser {
         } catch (IOException e) {
             System.out.println("An error has occured awaiting a connection. Stopping attempt...");
         }
-
     }
 
     public boolean isPaused(){
         return _paused;
     }
-
-
 }

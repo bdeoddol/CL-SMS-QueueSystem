@@ -77,7 +77,7 @@ void App::displayOptions(){
     cout << "    12. Start Arduino Listener" << endl; 
     cout << "    13. Stop Arduino Listener" << endl; 
     cout << "=============================================" << endl;
-    cout << "Enter command number: ";
+    cout << "Enter command number: " << endl;
 }
 
 void App::handle(string input){
@@ -375,7 +375,7 @@ void App::receivingStream(){
             if(fc.getMsgID() >= 0){
                 confirmID = fc.getMsgID();
                 sendConfirmation(confirmID);
-                cout << "hi i just send back confirmID: " << confirmID << endl;
+                cout << "confirming group w/ id: " << confirmID << endl;
             }
         }        
     }

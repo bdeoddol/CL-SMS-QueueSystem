@@ -17,9 +17,11 @@ public class FormContainer {
 
    }
 
-   public int getMsgInc() {
-      return _msgID;
-   }
+   public String getFullName() { return _fullName; }
+   public String getPrimaryNumber() { return _primaryPhoneNumber; }
+   public int getProjectID() { return _projectID; }
+   public int getGroupSize() { return _groupSize; }
+   public int getMsgID() { return _msgID; }
 
 
    public String convertToString() {
