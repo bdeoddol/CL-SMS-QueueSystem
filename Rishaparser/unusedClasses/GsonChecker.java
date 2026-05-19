@@ -1,4 +1,4 @@
-package Rishaparser;
+package Rishaparser.unusedClasses;
 import com.google.gson.Gson;
 
 //j checking gson is working

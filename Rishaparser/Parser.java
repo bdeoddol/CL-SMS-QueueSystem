@@ -201,8 +201,10 @@ public class Parser {
         _port = port;
         try {
             _server = new ServerSocket(_port);
+            System.out.println("Server started on port " + _port);
         } catch (IOException | IllegalArgumentException e) {
             System.out.println("An error has occured while calling startUpServerSocket. returning.....");
+            e.printStackTrace();
         }
     }
 

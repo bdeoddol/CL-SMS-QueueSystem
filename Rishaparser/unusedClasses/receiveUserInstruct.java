@@ -1,5 +1,6 @@
-package Rishaparser;
+package Rishaparser.unusedClasses;
 
+import Rishaparser.Parser;
 
 public class receiveUserInstruct implements Runnable {
     private static Parser currParser;
