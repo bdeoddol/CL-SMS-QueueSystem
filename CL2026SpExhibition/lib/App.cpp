@@ -1,5 +1,6 @@
 #include "App.h"
 #include "utilityFunc.h"
+#include <iostream>
 #include <tabulate/table.hpp>
 #include <sstream>
 #include <thread>
@@ -44,7 +45,7 @@ App::App(string* projects, int numProj){
     }
     ///////////////////////////////
 
-    this->_arduinoListening = true; // *** ADDED
+    this->_arduinoListening = false; // *** ADDED
     
 
 }
@@ -262,6 +263,7 @@ void App::connectToJavaServer(string hostIP, int portNumber, string protocol){
     }
 
     startReceiveThread();
+    cout << "Successfully connected at port: " << portNumber << endl;   
     return;
 }
 
@@ -467,7 +469,7 @@ void App::groupManagerStatus(int projID){
             return;
         }
     }
-    cout << "! No GroupManager for projectID: " << projID << " found" << endl;
+    // cout << "! No GroupManager for projectID: " << projID << " found" << endl;
 }
 
 void App::programStatus(){
@@ -541,14 +543,14 @@ void App::listenArduino() {
         cout << "Received: [" << msg << "] size=" << msg.size() << endl;
 
         // *** ADDED: robust matching (DO NOT use ==)
-        if (msg.find("8") != std::string::npos) {
+        if (msg == "86!") {
             pop(1);
             cout << "! hi confirm" << endl;
         }
-        else if (msg.find("F") != std::string::npos) {
+        else if (msg == "Frisson") {
             pop(2);
         }
-        else if (msg.find("D") != std::string::npos) {
+        else if (msg == "Desk Drawer") {
             pop(3);
         }
     }
