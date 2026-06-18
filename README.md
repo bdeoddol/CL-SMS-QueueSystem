@@ -1,6 +1,7 @@
 # CL-SMS-Queue-System
 ##  A real-time, multi-threaded system integrating network and hardware inputs
 This project has been closed temporarily. It has been deployed on 4/30/2026 <br>
+To deploy, execute arduino ide, close the ide, start java side, start cpp side, connect
 Below are points of feedback and notes taken during it's deployment for future improvement <br>
 *   While this project was intended to function similar to a waitlist at a restaurant by organizing groups under a single name and contact, many submissions turned out to be singles from the same group
     * enforce group based submission
