@@ -3,6 +3,7 @@
 This project has been closed temporarily. It has been deployed on 4/30/2026 <br>
 To deploy, execute arduino ide, close the ide, start java side, start cpp side, connect
 Below are points of feedback and notes taken during it's deployment for future improvement <br>
+This was helpful https://beej.us/guide/bgnet/html/
 *   While this project was intended to function similar to a waitlist at a restaurant by organizing groups under a single name and contact, many submissions turned out to be singles from the same group
     * enforce group based submission
     * allow manual group creation/deletion/modification
